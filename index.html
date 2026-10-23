@@ -85,8 +85,10 @@ body.has-photo .drop { opacity: 0; pointer-events: none; }
 /* Paddle arms from the Figma file, at their Figma positions */
 .arm { position: absolute; transform: translateY(calc(260 * var(--k))); opacity: 0; transition: transform .55s cubic-bezier(.2,.9,.25,1.15), opacity .35s; pointer-events: none; }
 .arm.up { transform: none; opacity: 1; }
-.arm img { display: block; width: 100%; height: 100%; }
+.arm img { display: block; width: 100%; height: 100%; filter: grayscale(1) brightness(.78); transition: filter .45s; }
+.arm.lead img { filter: none; }
 .arm .num { position: absolute; display: grid; place-items: center; font-weight: 700; color: #1b1b1b; font-size: calc(15 * var(--k)); letter-spacing: -.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.arm .num { color: #6a6a6a; transition: color .3s; }
 .arm.lead .num { color: var(--red-deep); }
 
 /* ---------- UI box: Figma coordinates fitted inside the viewport ---------- */
@@ -531,7 +533,6 @@ body.narrow .bar.bottom { position: relative; top: auto; padding-block: 18px max
       caption.textContent = `${money(price)} to ${bidders[0].bidder}. Do I hear more?`;
       await sleep(Math.min(1200, 4000 - (Date.now() - t0)));
     }
-    armEls.forEach(a => a.classList.add("up"));
     caption.textContent = "Going once…"; await sleep(800);
     caption.textContent = "Going twice…"; await sleep(800);
     caption.textContent = "Sold!"; await sleep(500);
