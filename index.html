@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What's Your Photo Worth?</title>
+<meta name="description" content="Drop in a photo and watch advertisers bid on it. Our AI reads your photo the way the ad industry would. Runs on your device; your photo is never uploaded.">
+<meta name="theme-color" content="#0f1110">
+<link rel="canonical" href="https://worth.ente.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ente">
+<meta property="og:title" content="What's your photo worth?">
+<meta property="og:description" content="Drop in a photo and watch advertisers bid on it. Your photo never leaves your device.">
+<meta property="og:url" content="https://worth.ente.com/">
+<meta property="og:image" content="https://worth.ente.com/assets/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What's your photo worth?">
+<meta name="twitter:description" content="Drop in a photo and watch advertisers bid on it. Your photo never leaves your device.">
+<meta name="twitter:image" content="https://worth.ente.com/assets/img/og.jpg">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="preload" href="assets/img/room.jpg" as="image">
+<link rel="preload" href="assets/fonts/inter-tight-300.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 300; font-display: swap; src: url("assets/fonts/inter-tight-300.woff2") format("woff2"); }
+@font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 400; font-display: swap; src: url("assets/fonts/inter-tight-400.woff2") format("woff2"); }
+@font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/inter-tight-500.woff2") format("woff2"); }
+@font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/inter-tight-600.woff2") format("woff2"); }
+@font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/inter-tight-700.woff2") format("woff2"); }
+@font-face { font-family: "Cinzel"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/cinzel-500.woff2") format("woff2"); }
+/* Layout: the Figma artboard (1440x900). The room art covers the viewport (--k units); the copy and the SOLD card sit in a 1440x900 box fitted inside the viewport (--u units). Narrow screens switch the copy to a stacked layout. Single dark look by design. */
+:root {
+  color-scheme: dark;
+  --ink: #ffffff;
+  --ink-dim: #a7a7a7;
+  --ink-faint: #a0a0a0;
+  --room: #0f1110;
+  --black: #050505;
+  --red: #ff3b3b;
+  --red-deep: #d92626;
+  --gold-ink: #f3dca4;
+  --paper: #eee6da;
+  --display: "Inter Tight", "Helvetica Neue", Arial, sans-serif;
+  --serif: "Cinzel", "Trajan Pro", Georgia, serif;
+  --k: 1px; --u: 1px; --ux: 0px; --uy: 0px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+[hidden] { display: none !important; }
+body { margin: 0; touch-action: manipulation; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; background: var(--room); color: var(--ink); font-family: var(--display); overflow: hidden; -webkit-font-smoothing: antialiased; }
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+
+/* ---------- Stage: the room art, covering the viewport ---------- */
+.viewport { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: var(--room); }
+.stage { position: absolute; left: 50%; top: 0; transform: translateX(-50%); background: var(--room) url("assets/img/room.jpg") center top / 100% 100% no-repeat; }
+.shade { position: absolute; inset: 0; pointer-events: none; transition: opacity .8s; }
+.shade.land { background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 6%, rgba(0,0,0,.14) 8%, rgba(0,0,0,.27) 12%, rgba(0,0,0,.31) 16%, rgba(0,0,0,.39) 24%, rgba(0,0,0,.5) 28%, rgba(0,0,0,.6) 32%, rgba(0,0,0,.68) 40%, rgba(0,0,0,.75) 48%, rgba(0,0,0,.82) 56%, rgba(0,0,0,.87) 64%, rgba(0,0,0,.9) 76%, rgba(0,0,0,.96) 88%, rgba(0,0,0,.98) 100%); }
+.shade.bid { opacity: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 19%, rgba(0,0,0,.08) 22%, rgba(0,0,0,.15) 28%, rgba(0,0,0,.19) 40%, rgba(0,0,0,.25) 60%, rgba(0,0,0,.3) 75%, rgba(0,0,0,.45) 100%); }
+body.bidding .shade.land { opacity: 0; }
+body.bidding .shade.bid { opacity: 1; }
+
+/* Gold frame: the colour version of the wall frame, revealed once a photo is hung */
+.gold { position: absolute; left: calc(558 * var(--k)); top: calc(43.5 * var(--k)); width: calc(324 * var(--k)); height: calc(284.5 * var(--k)); opacity: 0; transition: opacity .9s; pointer-events: none; }
+body.has-photo .gold { opacity: 1; }
+body.is-sold .gold, body.is-sold .canvas { opacity: 0; transition-delay: .3s; }
+
+/* The frame's inner canvas: 594,107 250x184 */
+.canvas { position: absolute; left: calc(594.16 * var(--k)); top: calc(107 * var(--k)); width: calc(250.5 * var(--k)); height: calc(184 * var(--k)); overflow: hidden; background: #000; }
+body.has-photo .canvas { background: transparent; }
+.canvas img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity .8s .2s; }
+body.has-photo .canvas img { opacity: 1; }
+.drop { position: absolute; left: calc(5.84 * var(--k)); top: calc(6 * var(--k)); width: calc(238 * var(--k)); height: calc(171 * var(--k)); border: calc(1 * var(--k)) dashed rgba(255,255,255,.55); background: #000; cursor: pointer; transition: background .2s, opacity .4s; }
+body.dragging .drop { background: #1c0606; border-color: var(--red); }
+body.has-photo .drop { opacity: 0; pointer-events: none; }
+.drop-title { position: absolute; left: calc(37 * var(--k)); top: calc(30 * var(--k)); display: flex; gap: calc(13 * var(--k)); align-items: flex-start; }
+.drop-title svg { width: calc(12 * var(--k)); height: calc(18 * var(--k)); flex: none; margin-top: calc(1 * var(--k)); }
+.drop-title span { font-size: calc(17 * var(--k)); line-height: calc(15 * var(--k)); letter-spacing: -.02em; color: #fff; }
+.drop-title small { display: block; margin-top: calc(5 * var(--k)); font-size: calc(12.4 * var(--k)); line-height: calc(12 * var(--k)); letter-spacing: -.03em; color: #d9d9d9; }
+.price-btn { position: absolute; left: calc(34.4 * var(--k)); top: calc(80 * var(--k)); width: calc(168.6 * var(--k)); height: calc(66.5 * var(--k)); border: 0; background: var(--red); color: #fff; text-align: left; padding: calc(15 * var(--k)) 0 0 calc(27.9 * var(--k)); font-size: calc(21 * var(--k)); line-height: calc(15 * var(--k)); letter-spacing: -.05em; display: block; transition: background .15s; }
+.price-btn:hover { background: var(--red-deep); }
+
+/* Paddle arms from the Figma file, at their Figma positions */
+.arm { position: absolute; transform: translateY(calc(260 * var(--k))); opacity: 0; transition: transform .55s cubic-bezier(.2,.9,.25,1.15), opacity .35s; pointer-events: none; }
+.arm.up { transform: none; opacity: 1; }
+.arm img { display: block; width: 100%; height: 100%; }
+.arm .num { position: absolute; display: grid; place-items: center; font-weight: 700; color: #1b1b1b; font-size: calc(15 * var(--k)); letter-spacing: -.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.arm.lead .num { color: var(--red-deep); }
+
+/* ---------- UI box: Figma coordinates fitted inside the viewport ---------- */
+.ui { position: fixed; left: var(--ux); top: var(--uy); width: calc(1440 * var(--u)); height: calc(900 * var(--u)); pointer-events: none; z-index: 5; }
+.ui a, .ui button { pointer-events: auto; }
+.landing { transition: opacity .5s, transform .5s; }
+body.has-photo .landing { opacity: 0; transform: translateY(calc(16 * var(--u))); }
+body.has-photo .landing a, body.has-photo .landing button { pointer-events: none; }
+h1 { position: absolute; left: calc(153 * var(--u)); top: calc(465 * var(--u)); margin: 0; font-weight: 300; font-size: calc(108 * var(--u)); line-height: calc(86 * var(--u)); letter-spacing: -.06em; white-space: nowrap; }
+h1 b { font-weight: 600; }
+.sub { position: absolute; left: calc(153 * var(--u)); top: calc(700 * var(--u)); margin: 0; color: var(--red); font-size: calc(31 * var(--u)); line-height: calc(29 * var(--u)); font-weight: 400; letter-spacing: -.045em; white-space: nowrap; }
+.links { position: absolute; left: calc(153 * var(--u)); top: calc(788 * var(--u)); display: flex; gap: calc(42 * var(--u)); font-size: calc(32 * var(--u)); line-height: calc(29 * var(--u)); font-weight: 300; letter-spacing: -.045em; white-space: nowrap; }
+.links button, .links a { background: none; border: 0; padding: 0; color: var(--ink-faint); text-decoration: none; font-weight: 300; letter-spacing: inherit; }
+.links button:hover, .links a:hover { color: #fff; }
+
+.bidding-copy { position: absolute; left: 0; right: 0; top: calc(640 * var(--u)); text-align: center; opacity: 0; transform: translateY(calc(20 * var(--u))); transition: opacity .5s, transform .5s; }
+body.bidding .bidding-copy { opacity: 1; transform: none; }
+body.is-sold .bidding-copy { opacity: 0; }
+.bidding-title { margin: 0; color: var(--red); font-weight: 400; font-size: calc(154 * var(--u)); line-height: 1; letter-spacing: -.06em; white-space: nowrap; }
+.caption { display: block; margin-top: calc(12 * var(--u)); font-size: calc(21 * var(--u)); color: #fff; letter-spacing: -.02em; min-height: 1.3em; font-variant-numeric: tabular-nums; }
+
+/* ---------- SOLD end card ---------- */
+.sold { position: fixed; inset: 0; z-index: 20; opacity: 0; pointer-events: none; transition: opacity .6s; overflow: hidden; }
+body.is-sold .sold { opacity: 1; pointer-events: auto; }
+.sold-shade { position: absolute; left: 0; right: 0; top: calc(var(--uy) + 123 * var(--u)); height: calc(676 * var(--u)); background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.42) 15%, rgba(0,0,0,.55) 30%, rgba(0,0,0,.65) 45%, rgba(0,0,0,.72) 60%, rgba(0,0,0,.78) 75%, rgba(0,0,0,.85) 100%); }
+.bar { position: absolute; left: 0; right: 0; background: var(--black); }
+.bar.top { top: 0; height: calc(var(--uy) + 123 * var(--u)); }
+.bar.bottom { top: calc(var(--uy) + 799 * var(--u)); bottom: 0; display: grid; place-items: center; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 8px max(8px, env(safe-area-inset-bottom, 0px)); }
+.hush { position: absolute; left: calc(var(--ux) + 430 * var(--u)); top: calc(var(--uy) + 60 * var(--u)); width: calc(580 * var(--u)); height: calc(560 * var(--u)); background: radial-gradient(closest-side, #000 62%, rgba(0,0,0,0)); }
+.sold-box { position: absolute; left: var(--ux); top: var(--uy); width: calc(1440 * var(--u)); height: calc(900 * var(--u)); }
+.lot { --s: var(--u); position: absolute; left: calc(503 * var(--u)); top: calc(222 * var(--u)); width: calc(470.35 * var(--s)); height: calc(430.6 * var(--s)); transform: scale(.75) rotate(4deg); opacity: 0; transition: transform .7s cubic-bezier(.2,.9,.25,1.2), opacity .4s; }
+body.is-sold .lot { transform: none; opacity: 1; }
+.lot .photo { position: absolute; left: calc(77.8 * var(--s)); top: calc(131.5 * var(--s)); width: calc(326 * var(--s)); height: calc(219 * var(--s)); object-fit: cover; transform: rotate(-9.8deg); background: #111; }
+.lot .frame { position: absolute; inset: 0; width: 100%; height: 100%; }
+.plaque { position: absolute; left: calc(192.7 * var(--s)); top: calc(212.2 * var(--s)); width: calc(258.45 * var(--s)); height: calc(157.7 * var(--s)); transform: scale(1.7) rotate(-6deg); opacity: 0; transition: transform .45s .6s cubic-bezier(.2,.9,.3,1.3), opacity .2s .6s; }
+body.is-sold .plaque { transform: none; opacity: 1; }
+.plaque img { display: block; width: 100%; height: 100%; }
+.plaque .price { position: absolute; left: calc(84 * var(--s)); top: calc(102 * var(--s)); width: calc(100 * var(--s)); height: calc(40 * var(--s)); display: grid; place-items: center; font-family: var(--serif); font-weight: 500; font-size: calc(32 * var(--s)); color: var(--gold-ink); transform: rotate(-4.6deg); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.roast { position: absolute; left: calc(320 * var(--u)); width: calc(800 * var(--u)); top: calc(656 * var(--u)); margin: 0; text-align: center; color: var(--red); font-size: calc(22 * var(--u)); line-height: 1.15; text-wrap: balance; letter-spacing: -.045em; }
+.actions { position: absolute; left: calc(522 * var(--u)); top: calc(712 * var(--u)); display: flex; gap: calc(82.6 * var(--u)); }
+.btn { width: calc(194.3 * var(--u)); height: calc(59.3 * var(--u)); font-size: calc(24 * var(--u)); letter-spacing: -.04em; border: 1px solid #fff; background: transparent; color: #fff; }
+.btn.primary { background: var(--red); border-color: var(--red); }
+.btn.primary:hover { background: var(--red-deep); border-color: var(--red-deep); }
+.btn:not(.primary):hover { background: rgba(255,255,255,.08); }
+.ente { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 18px; text-align: center; font-size: clamp(13px, 1.2vw, 16px); color: var(--ink-dim); max-width: 100%; }
+.ente b { color: #fff; font-weight: 600; }
+.ente a { color: #fff; background: none; border: 1px solid rgba(255,255,255,.5); padding: 7px 14px; text-decoration: none; white-space: nowrap; font-weight: 500; }
+.ente a:hover { background: #fff; color: #000; }
+.fine { width: 100%; text-align: center; font-size: 12px; color: #6f6f6f; }
+.fine button { background: none; border: 0; padding: 0; color: #9a9a9a; text-decoration: underline; text-underline-offset: 2px; font-size: inherit; }
+.share-card { display: grid; gap: 14px; }
+.share-card h2 { margin: 0; }
+.share-card img { width: 100%; max-height: 52vh; object-fit: contain; background: #000; }
+.share-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { display: inline-block; padding: 9px 14px; font-size: 15px; border: 1px solid #555; background: transparent; color: #fff; text-decoration: none; }
+.pill:hover { border-color: #fff; }
+.pill.solid { background: var(--red); border-color: var(--red); }
+.share-text { width: 100%; font: inherit; font-size: 14px; color: #ddd; background: #0c0c0c; border: 1px solid #333; padding: 8px 10px; resize: none; }
+.share-card .sheet-close { justify-self: start; margin-top: 0; background: #2a2a2a; }
+
+/* ---------- Narrow screens: stack the copy ---------- */
+body.narrow .ui { left: 0; top: 0; width: 100%; height: 100%; }
+body.narrow .landing { position: absolute; left: 0; right: 0; bottom: 0; display: grid; gap: 14px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); padding-block: 0 max(30px, env(safe-area-inset-bottom, 0px)); }
+body.narrow h1, body.narrow .sub, body.narrow .links { position: static; white-space: normal; }
+body.narrow h1 { font-size: clamp(50px, 15vw, 76px); line-height: .95; }
+body.narrow .sub { font-size: 18px; line-height: 1.3; }
+body.narrow .links { font-size: 16px; gap: 10px 20px; flex-wrap: wrap; }
+@media (max-height: 700px) { body.narrow h1 { font-size: 46px; } body.narrow .sub { font-size: 16px; } body.narrow .landing { gap: 10px; } }
+.links > * { white-space: nowrap; }
+body.narrow .bidding-copy { top: auto; bottom: max(36px, env(safe-area-inset-bottom, 0px)); padding-inline: 16px; }
+body.narrow .bidding-title { font-size: clamp(40px, 12.5vw, 64px); white-space: normal; line-height: .95; }
+body.narrow .caption { font-size: 16px; margin-top: 14px; }
+body.narrow .sold { overflow-y: auto; background: var(--black); }
+body.narrow .sold-shade, body.narrow .hush, body.narrow .bar.top { display: none; }
+body.narrow .sold-box { position: relative; left: 0; top: 0; width: 100%; height: auto; display: grid; justify-items: center; gap: 22px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: max(48px, env(safe-area-inset-top, 0px)) 24px; }
+body.narrow .lot { --s: calc(min(88vw, 470px) / 470.35); position: relative; left: auto; top: auto; }
+body.narrow .roast, body.narrow .actions { position: static; }
+body.narrow .roast { width: auto; font-size: 18px; max-width: 30em; margin-top: -8px; }
+body.narrow .actions { gap: 14px; }
+body.narrow .btn { width: 140px; height: 50px; font-size: 17px; }
+body.narrow .bar.bottom { position: relative; top: auto; padding-block: 18px max(24px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid #1c1c1c; }
+
+/* ---------- Method sheet ---------- */
+.sheet { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.72); display: grid; place-items: center; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 24px; }
+.sheet-card { background: #141414; color: #ececec; border: 1px solid #2a2a2a; max-width: 620px; width: 100%; max-height: 100%; overflow-y: auto; padding: 26px 26px 22px; }
+.sheet-card h2 { margin: 0 0 10px; font-size: 26px; font-weight: 500; letter-spacing: -.03em; }
+.sheet-card h3 { margin: 18px 0 6px; font-size: 15px; font-weight: 600; color: var(--red); letter-spacing: -.01em; }
+.sheet-card p { font-size: 15px; line-height: 1.55; color: #bdbdbd; margin: 0 0 8px; }
+.tiers { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 6px; color: #d6d6d6; }
+.tiers td, .tiers th { text-align: left; padding: 7px 6px; border-bottom: 1px solid #2a2a2a; vertical-align: top; }
+.tiers th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #8c8c8c; font-weight: 500; }
+.tiers td:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sheet-close { margin-top: 16px; background: var(--red); color: #fff; border: 0; padding: 10px 20px; font-size: 15px; }
+
+.toast { position: fixed; z-index: 40; left: 50%; bottom: max(24px, env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: #fff; color: #111; padding: 10px 16px; font-size: 15px; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; max-width: calc(100vw - 32px); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="viewport" id="viewport">
+  <div class="stage" id="stage">
+    <div class="shade land"></div>
+    <div class="shade bid"></div>
+    <img class="gold" src="assets/img/gold.webp" alt="">
+    <div class="canvas" id="canvas">
+      <img id="lotImg" alt="">
+      <div class="drop" id="drop" role="button" tabindex="-1" aria-label="Drop a photo here">
+        <div class="drop-title">
+          <svg viewBox="0 0 12 18" aria-hidden="true"><path d="M6 17V2M1 7l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span id="dropText">Drag a photo here<small>or tap to choose one</small></span>
+        </div>
+        <button class="price-btn" id="pickBtn" type="button">Price<br>my photo</button>
+      </div>
+    </div>
+    <div id="arms"></div>
+  </div>
+</div>
+<input type="file" id="fileInput" accept="image/*" hidden>
+
+<div class="ui" id="ui">
+  <div class="landing">
+    <h1>What’s your<br>photo <b>worth?</b></h1>
+    <p class="sub">Drop in a photo. Our AI reads it the way the ad industry would.</p>
+    <div class="links">
+      <button type="button" data-open-method>How we calculate this?</button>
+      <a href="https://ente.com" target="_blank" rel="noopener">About Ente</a>
+      <button type="button" id="sampleBtn">Try a sample</button>
+    </div>
+  </div>
+  <div class="bidding-copy" aria-live="polite">
+    <p class="bidding-title">Bidding in progress</p>
+    <span class="caption" id="caption">The auctioneer is examining the lot…</span>
+  </div>
+</div>
+
+<section class="sold" id="sold" aria-live="polite" aria-label="Auction result">
+  <div class="sold-shade"></div>
+  <div class="hush"></div>
+  <div class="bar top"></div>
+  <div class="sold-box">
+    <div class="lot">
+      <img class="photo" id="soldImg" alt="Your photo">
+      <img class="frame" src="assets/img/frame.webp" alt="">
+      <div class="plaque"><img src="assets/img/plaque.webp" alt="SOLD"><span class="price" id="soldPrice">$0.00</span></div>
+    </div>
+    <p class="roast" id="roast"></p>
+    <div class="actions">
+      <button class="btn primary" id="shareBtn" type="button">Share</button>
+      <button class="btn" id="retryBtn" type="button">Retry</button>
+    </div>
+  </div>
+  <div class="bar bottom">
+    <div class="ente">
+      <span><b>Not for sale?</b> Ente keeps your photos end-to-end encrypted, so nobody can scan them or bid on them.</span>
+      <a href="https://ente.com" target="_blank" rel="noopener">Get 10 GB free</a>
+      <p class="fine" id="fine">Illustrative estimate. No real auction took place and nothing was sold. <button type="button" data-open-method>How we calculate this</button></p>
+    </div>
+  </div>
+</section>
+
+<div class="sheet" id="method" hidden role="dialog" aria-modal="true" aria-labelledby="methodTitle">
+  <div class="sheet-card">
+    <h2 id="methodTitle">How we price your photo</h2>
+    <p>An image recognition model (MobileNet, trained to recognise about 1,000 kinds of objects and scenes) runs right here in your browser. Your photo is never uploaded, stored or sent anywhere.</p>
+    <p>We match what the model sees to the kinds of audiences advertisers pay to reach, then stage an auction between made-up bidders. The final price is the highest bid.</p>
+    <h3>What moves the price</h3>
+    <table class="tiers">
+      <tr><th>What we spot</th><th>Example</th><th>Bids</th></tr>
+      <tr><td>Everyday interests</td><td>Food, gadgets, fashion, fitness</td><td>$0.20 to $1</td></tr>
+      <tr><td>Buying signals</td><td>Travel, cars, a home</td><td>$0.50 to $2</td></tr>
+      <tr><td>Life events</td><td>A wedding, a baby, a move</td><td>$2 to $9</td></tr>
+    </table>
+    <p style="margin-top:12px">Advertisers pay the most for people whose spending is about to change, which is why life events jump in price. The tiers reflect how ad pricing works in general; the exact amounts are illustrative, not real quotes.</p>
+    <h3>What we never guess</h3>
+    <p>Age, gender, ethnicity, health, religion, sexuality or anything about children. The model here can't, and we wouldn't want it to.</p>
+    <h3>Why Ente made this</h3>
+    <p>Whoever stores your photos can see what's in them. Ente encrypts your photos on your device, so we can't see them at all.</p>
+    <button class="sheet-close" type="button" id="methodClose">Close</button>
+  </div>
+</div>
+
+<div class="sheet" id="shareSheet" hidden role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+  <div class="sheet-card share-card">
+    <h2 id="shareTitle">Share your sale</h2>
+    <img id="cardPreview" alt="Your SOLD card">
+    <div class="share-row">
+      <button type="button" class="pill solid" id="dlBtn">Download image</button>
+      <button type="button" class="pill" id="copyBtn">Copy text</button>
+      <a class="pill" id="xLink" target="_blank" rel="noopener">Post on X</a>
+      <a class="pill" id="fbLink" target="_blank" rel="noopener">Facebook</a>
+      <a class="pill" id="waLink" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+    <textarea class="share-text" id="shareText" rows="2" readonly aria-label="Share text"></textarea>
+    <button class="sheet-close" type="button" id="shareClose">Close</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="assets/js/tf.min.js"></script>
+<script>
+(() => {
+  const SHARE_URL = location.href.split("#")[0].split("?")[0];
+  const IMG = { sample: "assets/img/sample.jpg", arms: { A: "assets/img/armA.webp", B: "assets/img/armB.webp", C: "assets/img/armC.webp", D: "assets/img/armD.webp", E: "assets/img/armE.webp" } };
+  const $ = (id) => document.getElementById(id);
+  const body = document.body;
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Sizing: art covers the viewport, UI box fits inside it ---------- */
+  const stage = $("stage"), root = document.documentElement.style;
+  let view = { k: 1, visL: 0, visW: 1440 };
+  function fit() {
+    const w = innerWidth, h = innerHeight;
+    const narrow = w < 760 || w / h < 1.05;
+    body.classList.toggle("narrow", narrow);
+    // phones: zoom the room so the wall frame (250 units wide) fills most of the screen width
+    const k = Math.max(w, h * 1.6) / 1440 * 1, kk = narrow ? Math.max(k, Math.min(w * 0.62 / 250, 2.2)) : k;
+    const sw = 1440 * kk, sh = 900 * kk;
+    stage.style.width = sw + "px";
+    stage.style.height = sh + "px";
+    root.setProperty("--k", kk + "px");
+    const u = Math.min(w / 1440, h / 900);
+    root.setProperty("--u", u + "px");
+    root.setProperty("--ux", (w - 1440 * u) / 2 + "px");
+    root.setProperty("--uy", (h - 900 * u) / 2 + "px");
+    view = { k: kk, visL: (sw - w) / 2 / kk, visW: w / kk };
+    placeArms();
+  }
+
+  /* ---------- Paddle arms: Figma image, position, size, and the card inside it ---------- */
+  const ARMS = [
+    { img: "C", x: 349, y: 345.2, w: 76.8, h: 211.3, card: [14.3, 9.3, 48.9, 42.8, -2] },
+    { img: "A", x: 392, y: 433, w: 184, h: 293.2, card: [96.2, 14.8, 67.7, 61.1, 13] },
+    { img: "D", x: 792, y: 391, w: 93, h: 241.8, card: [12.4, 10.5, 58.3, 48.4, 0] },
+    { img: "E", x: 987, y: 367.5, w: 81.5, h: 144.5, card: [8.1, 8.1, 63.6, 46.2, 0] },
+    { img: "B", x: 1121, y: 434.4, w: 108.5, h: 200.1, card: [8.8, 11.3, 67.7, 50.2, 1] },
+  ];
+  const armEls = ARMS.map((a) => {
+    const el = document.createElement("div");
+    el.className = "arm";
+    el.style.width = `calc(${a.w} * var(--k))`;
+    el.style.height = `calc(${a.h} * var(--k))`;
+    el.innerHTML = `<img alt="" src="${IMG.arms[a.img]}"><span class="num"></span>`;
+    const n = el.querySelector(".num"), [cx, cy, cw, ch, rot] = a.card;
+    Object.assign(n.style, { left: `calc(${cx} * var(--k))`, top: `calc(${cy} * var(--k))`, width: `calc(${cw} * var(--k))`, height: `calc(${ch} * var(--k))`, transform: `rotate(${rot}deg)` });
+    $("arms").appendChild(el);
+    return el;
+  });
+  function placeArms() {
+    const narrow = view.visW < 1300;
+    const x0 = 349, span = 1229.5 - 349;
+    ARMS.forEach((a, i) => {
+      let x = a.x;
+      if (narrow) {
+        const room = Math.max(view.visW - 24, 200);
+        x = view.visL + 6 + (a.x - x0) / span * (room - a.w * 0.75) - (i === 1 ? 45 : 0);
+      }
+      armEls[i].style.left = `calc(${x} * var(--k))`;
+      armEls[i].style.top = `calc(${a.y + (narrow ? -95 : 0)} * var(--k))`;
+    });
+  }
+  addEventListener("resize", fit); fit();
+  if (matchMedia("(pointer: coarse)").matches) $("dropText").innerHTML = "Tap to add a photo<small>from your camera roll or camera</small>";
+
+  /* ---------- Bidders and what they want ---------- */
+  const dogs = [], cats = [];
+  for (let i = 151; i <= 268; i++) dogs.push(i);
+  for (let i = 281; i <= 285; i++) cats.push(i);
+  const C = (lo, hi, o) => Object.assign({ lo, hi }, o);
+  const CATS = [
+    C(0.30, 0.95, { key: "pets", bidder: "Paws & Co.", reason: "the pet", idx: dogs.concat(cats), words: ["hamster", "guinea pig", "wood rabbit", "goldfish", "Persian cat", "Siamese cat"], roast: "Congrats, you’re sold to Paws & Co. Your pet did all the work." }),
+    C(0.60, 1.85, { key: "car", bidder: "DriveNow Motors", reason: "the car", words: ["sports car", "convertible", "minivan", "jeep", "limousine", "cab", "pickup", "beach wagon", "car wheel", "racer", "grille", "Model T", "recreational vehicle", "golfcart", "moped", "motor scooter", "tow truck", "car mirror"], roast: "Congrats, you’re sold to DriveNow Motors. They’d like a word about your next car." }),
+    C(0.50, 1.55, { key: "travel", bidder: "Wanderlust Travel", reason: "the view", words: ["seashore", "sandbar", "lakeside", "alp", "valley", "volcano", "cliff", "coral reef", "promontory", "geyser", "boathouse", "airliner", "liner", "catamaran", "canoe", "yawl", "schooner", "speedboat", "mountain tent", "dock", "pier", "palace", "castle", "monastery", "church", "mosque", "triumphal arch", "obelisk", "suspension bridge", "steel arch bridge", "beacon", "breakwater", "fountain", "cliff dwelling", "stupa", "bell cote", "dome", "megalith", "gondola", "paddlewheel", "lifeboat"], roast: "Congrats, you’re sold to Wanderlust Travel. Pack your bags; they already have." }),
+    C(0.25, 0.80, { key: "food", bidder: "Crave Delivery", reason: "the food", words: ["pizza", "cheeseburger", "hotdog", "burrito", "ice cream", "espresso", "plate", "carbonara", "guacamole", "consomme", "trifle", "bagel", "pretzel", "French loaf", "meat loaf", "potpie", "chocolate sauce", "dough", "bakery", "restaurant", "frying pan", "wok", "hot pot", "strawberry", "orange", "banana", "pineapple", "pomegranate", "lemon", "fig", "broccoli", "mushroom", "espresso maker", "coffee mug", "coffeepot", "ice lolly", "mashed potato", "spaghetti squash", "butcher shop", "grocery store"], roast: "Congrats, you’re sold to Crave Delivery. Dinner ads incoming." }),
+    C(0.35, 0.95, { key: "drinks", bidder: "Last Call Bars", reason: "the drinks", words: ["red wine", "beer bottle", "wine bottle", "beer glass", "cocktail shaker", "eggnog", "whiskey jug", "goblet", "corkscrew", "bar", "pop bottle"], roast: "Congrats, you’re sold to Last Call Bars. See you Friday, apparently." }),
+    C(0.30, 0.90, { key: "fitness", bidder: "FitLife Gyms", reason: "the workout", words: ["dumbbell", "barbell", "running shoe", "jersey", "sweatshirt", "swimming trunks", "bikini", "maillot", "ski", "snowmobile", "mountain bike", "bicycle-built-for-two", "unicycle", "basketball", "soccer ball", "tennis ball", "volleyball", "rugby ball", "golf ball", "baseball", "racket", "balance beam", "horizontal bar", "parallel bars", "snorkel", "paddle", "scuba diver", "ballplayer", "puck", "football helmet"], roast: "Congrats, you’re sold to FitLife Gyms. They have some thoughts about January." }),
+    C(0.60, 1.60, { key: "home", bidder: "SafeHome Insurance", reason: "the home", words: ["studio couch", "four-poster", "dining table", "desk", "wardrobe", "bookcase", "china cabinet", "entertainment center", "home theater", "window shade", "quilt", "patio", "rocking chair", "folding chair", "table lamp", "lampshade", "chiffonier", "medicine chest", "shower curtain", "bathtub", "tub", "washbasin", "refrigerator", "microwave", "dishwasher", "stove", "washer", "vacuum", "radiator", "fire screen", "sliding door", "picket fence", "mailbox", "lawn mower", "greenhouse", "doormat", "pillow", "wall clock"], roast: "Congrats, you’re sold to SafeHome Insurance. They’ve already noticed the stairs." }),
+    C(0.30, 0.90, { key: "tech", bidder: "GadgetHub", reason: "the gadgets", words: ["laptop", "notebook", "iPod", "cellular telephone", "monitor", "desktop computer", "screen", "television", "joystick", "mouse", "computer keyboard", "remote control", "hand-held computer", "modem", "printer", "loudspeaker", "Polaroid camera", "reflex camera", "projector", "digital watch"], roast: "Congrats, you’re sold to GadgetHub. Your next upgrade is already in your feed." }),
+    C(0.25, 0.75, { key: "fashion", bidder: "StyleHaus", reason: "the outfit", words: ["jean", "miniskirt", "sunglasses", "sunglass", "purse", "lipstick", "perfume", "wallet", "cardigan", "trench coat", "fur coat", "kimono", "abaya", "cowboy hat", "sombrero", "bonnet", "wig", "necklace", "sandal", "clog", "cowboy boot", "Loafer", "velvet", "stole", "poncho", "feather boa", "cloak", "lab coat", "mortarboard"], roast: "Congrats, you’re sold to StyleHaus. Your wardrobe has been noted." }),
+    C(2.60, 6.80, { key: "wedding", life: true, min: 0.06, bidder: "Big Day Weddings", reason: "the big day", words: ["groom", "gown", "suit", "bow tie", "Windsor tie", "hoopskirt", "overskirt", "chain mail"], roast: "Congrats, you’re sold to Big Day Weddings. They spotted the occasion before your friends did." }),
+    C(3.10, 8.60, { key: "baby", life: true, min: 0.06, bidder: "TinySteps Baby", reason: "the baby gear", words: ["crib", "cradle", "bassinet", "diaper", "bib", "teddy", "nipple", "toyshop"], roast: "Congrats, you’re sold to TinySteps Baby. Best wishes from 400 advertisers." }),
+    C(1.80, 4.40, { key: "moving", life: true, min: 0.06, bidder: "Nest & Co. Furniture", reason: "the boxes", words: ["carton", "moving van", "packet", "crate", "envelope"], roast: "Congrats, you’re sold to Nest & Co. Furniture. Every furniture store in town just perked up." }),
+    C(0.30, 0.85, { key: "party", min: 0.08, bidder: "PartyBox", reason: "the party", words: ["candle", "balloon", "confectionery", "chocolate sauce", "jack-o'-lantern", "pinwheel"], roast: "Congrats, you’re sold to PartyBox. They’d love to plan the next one." }),
+  ];
+  const BASE = { key: "base", bidder: "Lifestyle Corp.", reason: "the general vibe", lo: 0.40, hi: 1.10, roast: "Congrats, you’re sold to Lifestyle Corp. Mom will be proud." };
+  const NIGHT = { key: "night", bidder: "Last Call Bars", reason: "the late night", lo: 0.30, hi: 0.70, roast: "Congrats, you’re sold to Last Call Bars. See you Friday, apparently." };
+  const OUTDOOR = { key: "outdoor", bidder: "Wanderlust Travel", reason: "the great outdoors", lo: 0.40, hi: 1.00, roast: "Congrats, you’re sold to Wanderlust Travel. Pack your bags; they already have." };
+  const EXTRA = [
+    { key: "x1", bidder: "BrightAds Network", reason: "the vibe", lo: 0.20, hi: 0.55 },
+    { key: "x2", bidder: "DataMart", reason: "the background", lo: 0.15, hi: 0.45 },
+    { key: "x3", bidder: "ClickFlow Media", reason: "the lighting", lo: 0.10, hi: 0.40 },
+    { key: "x4", bidder: "AudienceOne", reason: "the details", lo: 0.10, hi: 0.35 },
+  ];
+
+  /* ---------- The model, loaded quietly in the background ---------- */
+  let classes = null, modelP = null;
+  function ensureTf() {
+    if (window.tf) return Promise.resolve();
+    return new Promise((res, rej) => {
+      const s = document.createElement("script");
+      s.src = "assets/js/tf.min.js";
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  function loadModel() {
+    if (modelP) return modelP;
+    modelP = (async () => {
+      await ensureTf();
+      await tf.ready();
+      const base = new URL("model/", document.baseURI).href;
+      const [model, names] = await Promise.all([
+        tf.loadGraphModel(base + "model.json"),
+        fetch(base + "classes.json").then(r => r.json())
+      ]);
+      classes = names;
+      tf.tidy(() => model.predict(tf.zeros([1, 224, 224, 3])));
+      return model;
+    })();
+    modelP.catch(() => {});
+    return modelP;
+  }
+  setTimeout(() => loadModel(), 400);
+
+  function pixelsOf(img, size) {
+    const c = document.createElement("canvas");
+    c.width = c.height = size;
+    const x = c.getContext("2d", { willReadFrequently: true });
+    const s = Math.min(img.naturalWidth, img.naturalHeight);
+    x.drawImage(img, (img.naturalWidth - s) / 2, (img.naturalHeight - s) / 2, s, s, 0, 0, size, size);
+    return c;
+  }
+
+  function photoStats(img) {
+    const d = pixelsOf(img, 48).getContext("2d").getImageData(0, 0, 48, 48).data;
+    let lum = 0, hash = 2166136261, sky = 0, green = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      lum += 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      hash = Math.imul(hash ^ (r + (g << 8) + (b << 16)), 16777619) >>> 0;
+      const row = Math.floor(i / 4 / 48);
+      if (row < 16 && b > r + 15 && b > 110) sky++;
+      if (g > r + 12 && g > b + 8) green++;
+    }
+    const n = d.length / 4;
+    return { lum: lum / n, hash, sky: sky / (48 * 16), green: green / n };
+  }
+
+  async function classify(img) {
+    const model = await loadModel();
+    const canvas = pixelsOf(img, 224);
+    const probs = tf.tidy(() => {
+      const t = tf.browser.fromPixels(canvas).toFloat().div(255).expandDims(0);
+      let out = model.predict(t);
+      if (Array.isArray(out)) out = out[0];
+      if (out.shape[1] === 1001) out = out.slice([0, 1], [1, 1000]);
+      return tf.softmax(out).dataSync();
+    });
+    const top = Array.from(probs).map((p, i) => [i, p]).sort((a, b) => b[1] - a[1]).slice(0, 12);
+    return top.map(([i, p]) => ({ i, name: classes[i], p }));
+  }
+
+  function rng(seed) {
+    let s = seed || 1;
+    return () => { s = Math.imul(s ^ (s >>> 15), 2246822507) ^ Math.imul(s ^ (s >>> 13), 3266489909); s ^= s >>> 16; return (s >>> 0) / 4294967296; };
+  }
+
+  function appraise(preds, stats) {
+    const rand = rng(stats.hash);
+    const found = [];
+    if (preds) {
+      for (const c of CATS) {
+        let s = 0;
+        for (const p of preds) if ((c.idx && c.idx.includes(p.i)) || (c.words && c.words.includes(p.name))) s += p.p;
+        if (s >= (c.min || 0.04)) found.push({ ...c, score: s });
+      }
+    }
+    if (stats.lum < 62 && !found.some(f => f.key === "drinks")) found.push({ ...NIGHT, score: 0.2 });
+    if ((stats.sky > 0.35 || stats.green > 0.35) && !found.some(f => f.key === "travel")) found.push({ ...OUTDOOR, score: 0.15 + stats.sky * 0.2 });
+    found.push({ ...BASE, score: 0.12 });
+    for (const f of found) {
+      const strength = Math.min(1, 0.35 + f.score * 1.4);
+      f.max = Math.round((f.lo + (f.hi - f.lo) * strength * (0.82 + rand() * 0.18)) * 100) / 100;
+    }
+    found.sort((a, b) => b.max - a.max);
+    const bidders = [];
+    for (const f of found) if (!bidders.some(b => b.bidder === f.bidder)) bidders.push(f);
+    for (const x of EXTRA) {
+      if (bidders.length >= 5) break;
+      bidders.push({ ...x, max: Math.round((x.lo + (x.hi - x.lo) * rand()) * 100) / 100 });
+    }
+    return { bidders: bidders.slice(0, 5), rand };
+  }
+
+  const money = (v) => "$" + v.toFixed(2);
+  const words = (v) => v < 1 ? Math.round(v * 100) + " cents" : money(v);
+  const cap = (s) => s[0].toUpperCase() + s.slice(1);
+  const sleep = (ms) => new Promise(r => setTimeout(r, reduced ? Math.min(ms, 120) : ms));
+
+  /* ---------- The auction: bidders raise their paddles in turn ---------- */
+  async function runAuction(result) {
+    const { bidders, rand } = result;
+    // seat bidders on the five arms in a shuffled order
+    const seats = [0, 1, 2, 3, 4].sort(() => rand() - 0.5);
+    const arm = (i) => armEls[seats[i]];
+    armEls.forEach(a => { a.classList.remove("up", "lead"); a.querySelector(".num").textContent = ""; });
+    const caption = $("caption");
+    let price = Math.max(0.05, Math.round(Math.min(...bidders.map(b => b.max)) * 0.15 * 100) / 100);
+    let leader = -1;
+    caption.textContent = "Lot 4821. One lovely photo. Do I hear " + words(price) + "?";
+    await sleep(1300);
+    const t0 = Date.now();
+    const bid = async (i, p, line) => {
+      price = p; leader = i;
+      armEls.forEach(a => a.classList.remove("lead"));
+      arm(i).querySelector(".num").textContent = money(price);
+      arm(i).classList.add("up", "lead");
+      caption.textContent = line;
+    };
+    let guard = 0;
+    while (guard++ < 12) {
+      const able = bidders.map((b, i) => i).filter(i => i !== leader && bidders[i].max > price + 0.04);
+      if (!able.length) break;
+      const i = able[Math.floor(rand() * able.length)];
+      const step = Math.max(0.03, (bidders[i].max - price) * (0.2 + rand() * 0.25));
+      let p = Math.min(bidders[i].max, Math.round((price + step) * 100) / 100);
+      if (able.length === 1 && i === 0) p = bidders[0].max;
+      await bid(i, p, `${cap(words(p))} from ${bidders[i].bidder}, for ${bidders[i].reason}!`);
+      await sleep(950 + rand() * 450);
+    }
+    if (leader !== 0) {
+      await bid(0, bidders[0].max, `${bidders[0].bidder} jumps in at ${money(bidders[0].max)}!`);
+      await sleep(1100);
+    }
+    // keep the room bidding for at least 4 seconds
+    while (!reduced && Date.now() - t0 < 4000) {
+      caption.textContent = `${money(price)} to ${bidders[0].bidder}. Do I hear more?`;
+      await sleep(Math.min(1200, 4000 - (Date.now() - t0)));
+    }
+    armEls.forEach(a => a.classList.add("up"));
+    caption.textContent = "Going once…"; await sleep(800);
+    caption.textContent = "Going twice…"; await sleep(800);
+    caption.textContent = "Sold!"; await sleep(500);
+    return { price, winner: bidders[0] };
+  }
+
+  /* ---------- Flow ---------- */
+  let busy = false, lastShare = "", lastSale = null, cardBlob = null;
+  async function auction(src) {
+    if (busy) return;
+    busy = true;
+    const img = $("lotImg");
+    try {
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = src; });
+    } catch (e) {
+      toast("That file didn't open. Try a JPG or PNG.");
+      busy = false; return;
+    }
+    $("soldImg").src = src;
+    body.classList.add("has-photo", "bidding");
+    $("caption").textContent = "The auctioneer is examining the lot…";
+    const stats = photoStats(img);
+    let preds = null;
+    const minWait = sleep(1600);
+    try { preds = await classify(img); } catch (e) { preds = null; }
+    await minWait;
+    const result = appraise(preds, stats);
+    const { price, winner } = await runAuction(result);
+    showSold(price, winner, !preds);
+    busy = false;
+  }
+
+  function showSold(price, winner, basic) {
+    $("soldPrice").textContent = money(price);
+    $("roast").textContent = winner.roast || `Congrats, you’re sold to ${winner.bidder}. Mom will be proud.`;
+    lastShare = `I just got auctioned off to ${winner.bidder} for ${money(price)}. What's your photo worth?`;
+    lastSale = { price, winner };
+    $("fine").firstChild.textContent = (basic ? "Quick estimate from colours only, because the recogniser didn't load. " : "") + "Illustrative estimate. No real auction took place and nothing was sold. ";
+    body.classList.add("is-sold");
+    $("sold").scrollTop = 0;
+    $("shareBtn").focus({ preventScroll: true });
+  }
+
+  function reset() {
+    body.classList.remove("is-sold", "bidding", "has-photo");
+    armEls.forEach(a => a.classList.remove("up", "lead"));
+    $("fileInput").value = "";
+    setTimeout(() => { $("lotImg").removeAttribute("src"); }, 600);
+    $("pickBtn").focus({ preventScroll: true });
+  }
+
+  function useFile(file) {
+    if (!file) return;
+    if (!/^image\//.test(file.type) && !/\.(jpe?g|png|webp|gif|heic|avif)$/i.test(file.name)) { toast("That isn't a photo. Try a JPG or PNG."); return; }
+    // Read as a data: URL; the artifact frame does not allow blob: images
+    const r = new FileReader();
+    r.onload = () => auction(r.result);
+    r.onerror = () => toast("That file didn't open. Try a JPG or PNG.");
+    r.readAsDataURL(file);
+  }
+
+  $("pickBtn").addEventListener("click", (e) => { e.stopPropagation(); $("fileInput").click(); });
+  $("drop").addEventListener("click", () => $("fileInput").click());
+  $("fileInput").addEventListener("change", (e) => useFile(e.target.files[0]));
+  $("sampleBtn").addEventListener("click", () => auction(IMG.sample));
+  $("retryBtn").addEventListener("click", reset);
+
+  let dragDepth = 0;
+  addEventListener("dragenter", (e) => { e.preventDefault(); if (!busy) { dragDepth++; body.classList.add("dragging"); } });
+  addEventListener("dragleave", () => { if (--dragDepth <= 0) { dragDepth = 0; body.classList.remove("dragging"); } });
+  addEventListener("dragover", (e) => e.preventDefault());
+  addEventListener("drop", (e) => { e.preventDefault(); dragDepth = 0; body.classList.remove("dragging"); if (!busy && !body.classList.contains("is-sold")) useFile(e.dataTransfer.files[0]); });
+  addEventListener("paste", (e) => { const f = [...(e.clipboardData?.files || [])][0]; if (f && !busy && !body.classList.contains("is-sold")) useFile(f); });
+
+  /* ---------- Share: a 1080x1350 SOLD card drawn on canvas ---------- */
+  const loadImg = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+  function wrap(x, text, maxW) {
+    const out = []; let line = "";
+    for (const w of text.split(" ")) { const t = line ? line + " " + w : w; if (x.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }
+    if (line) out.push(line); return out;
+  }
+  async function makeCard() {
+    const [room, frame, plaque, photo] = await Promise.all([loadImg("assets/img/room.jpg"), loadImg("assets/img/frame.webp"), loadImg("assets/img/plaque.webp"), loadImg($("soldImg").src)]);
+    await Promise.all(["300 40px 'Inter Tight'", "600 40px 'Inter Tight'", "500 40px Cinzel"].map(f => document.fonts.load(f).catch(() => {})));
+    const W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d");
+    x.fillStyle = "#050505"; x.fillRect(0, 0, W, H);
+    const rh = H, rw = rh * 1.6; x.drawImage(room, (W - rw) / 2, 0, rw, rh);
+    const g = x.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "rgba(0,0,0,.55)"); g.addColorStop(.45, "rgba(0,0,0,.6)"); g.addColorStop(.75, "rgba(0,0,0,.85)"); g.addColorStop(1, "rgba(0,0,0,.96)");
+    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    const s = 2.0, lx = (W - 470.35 * s) / 2, ly = 120;
+    x.save(); x.translate(lx, ly); x.scale(s, s);
+    x.save(); x.translate(240.8, 241); x.rotate(-9.8 * Math.PI / 180);
+    const pw = 326, ph = 219, r = Math.max(pw / photo.naturalWidth, ph / photo.naturalHeight);
+    x.beginPath(); x.rect(-pw / 2, -ph / 2, pw, ph); x.clip();
+    x.drawImage(photo, -photo.naturalWidth * r / 2, -photo.naturalHeight * r / 2, photo.naturalWidth * r, photo.naturalHeight * r);
+    x.restore();
+    x.drawImage(frame, 0, 0, 470.35, 430.6);
+    x.save(); x.translate(192.7, 212.2); x.drawImage(plaque, 0, 0, 258.45, 157.7);
+    x.translate(134, 122); x.rotate(-4.6 * Math.PI / 180);
+    x.fillStyle = "#f3dca4"; x.font = "500 32px Cinzel, Georgia, serif"; x.textAlign = "center"; x.textBaseline = "middle";
+    x.fillText(money(lastSale.price), 0, 0);
+    x.restore(); x.restore();
+    x.textAlign = "center"; x.textBaseline = "alphabetic";
+    x.fillStyle = "#ff3b3b"; x.font = "400 42px 'Inter Tight', Arial, sans-serif";
+    const lines = wrap(x, $("roast").textContent, 900);
+    lines.forEach((l, i) => x.fillText(l, W / 2, 1050 + i * 52));
+    x.textAlign = "left"; x.fillStyle = "#fff"; x.font = "300 50px 'Inter Tight', Arial, sans-serif";
+    x.fillText("What’s your photo", 70, 1250);
+    const w1 = x.measureText("What’s your photo ").width; x.font = "600 50px 'Inter Tight', Arial, sans-serif"; x.fillText("worth?", 70 + w1, 1250);
+    x.fillStyle = "#9a9a9a"; x.font = "300 28px 'Inter Tight', Arial, sans-serif";
+    x.fillText(SHARE_URL.replace(/^https?:\/\//, "").replace(/\/$/, ""), 70, 1296);
+    x.textAlign = "right"; x.fillText("by Ente", W - 70, 1296);
+    return new Promise(res => c.toBlob(res, "image/png"));
+  }
+  const fullText = () => lastShare + " " + SHARE_URL;
+  $("shareBtn").addEventListener("click", async () => {
+    const btn = $("shareBtn"); btn.disabled = true;
+    try { cardBlob = await makeCard(); } catch (e) { cardBlob = null; }
+    btn.disabled = false;
+    const file = cardBlob && new File([cardBlob], "my-photo-sold.png", { type: "image/png" });
+    if (file && navigator.canShare && navigator.canShare({ files: [file] }) && matchMedia("(pointer: coarse)").matches) {
+      try { await navigator.share({ files: [file], text: fullText() }); return; } catch (e) { if (e.name === "AbortError") return; }
+    }
+    const u = encodeURIComponent(SHARE_URL), tx = encodeURIComponent(lastShare);
+    $("xLink").href = `https://x.com/intent/post?text=${tx}&url=${u}`;
+    $("fbLink").href = `https://www.facebook.com/sharer/sharer.php?u=${u}`;
+    $("waLink").href = `https://wa.me/?text=${encodeURIComponent(fullText())}`;
+    $("shareText").value = fullText();
+    const prev = $("cardPreview");
+    if (cardBlob) { prev.hidden = false; prev.src = URL.createObjectURL(cardBlob); } else prev.hidden = true;
+    $("dlBtn").hidden = !cardBlob;
+    $("shareSheet").hidden = false; $("shareClose").focus();
+  });
+  $("dlBtn").addEventListener("click", () => {
+    const a = document.createElement("a"); a.href = $("cardPreview").src; a.download = "my-photo-sold.png";
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+  $("copyBtn").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(fullText()); toast("Copied. Paste it anywhere."); }
+    catch (e) { const t = $("shareText"); t.focus(); t.select(); toast("Copy the selected text."); }
+  });
+  const shareSheet = $("shareSheet");
+  $("shareClose").addEventListener("click", () => { shareSheet.hidden = true; });
+  shareSheet.addEventListener("click", (e) => { if (e.target === shareSheet) shareSheet.hidden = true; });
+  addEventListener("keydown", (e) => { if (e.key === "Escape") shareSheet.hidden = true; });
+
+  const method = $("method");
+  document.querySelectorAll("[data-open-method]").forEach(b => b.addEventListener("click", () => { method.hidden = false; $("methodClose").focus(); }));
+  $("methodClose").addEventListener("click", () => { method.hidden = true; });
+  method.addEventListener("click", (e) => { if (e.target === method) method.hidden = true; });
+  addEventListener("keydown", (e) => { if (e.key === "Escape") method.hidden = true; });
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $("toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+  }
+})();
+</script>
+</body>
+</html>
