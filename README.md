@@ -13,7 +13,7 @@ The site must be served over HTTPS for the mobile share sheet to work.
 
 ## Before launch
 
-1. Replace `https://worth.ente.com/` in `index.html` (canonical link and the og/twitter tags) with the real URL. Share links use whatever URL the page is served from, so they need no change.
+1. Replace `https://rahzabull.github.io/Know-your-worth/` in `index.html` (canonical link and the og/twitter tags) with the real URL. Share links use whatever URL the page is served from, so they need no change.
 2. Check the social preview with https://www.opengraph.xyz once deployed.
 3. Have legal review the pricing copy in the "How we calculate this?" sheet (prices are illustrative).
 
