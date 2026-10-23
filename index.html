@@ -64,7 +64,7 @@ body.bidding .shade.land { opacity: 0; }
 body.bidding .shade.bid { opacity: 1; }
 
 /* Gold frame: the colour version of the wall frame, revealed once a photo is hung */
-.gold { position: absolute; left: calc(558 * var(--k)); top: calc(43.5 * var(--k)); width: calc(324 * var(--k)); height: calc(284.5 * var(--k)); opacity: 0; transition: opacity .9s; pointer-events: none; }
+.gold { position: absolute; left: calc(558 * var(--k)); top: calc(43.5 * var(--k)); width: calc(324 * var(--k)); height: calc(284.5 * var(--k)); opacity: 1; transition: opacity .9s; pointer-events: none; }
 body.has-photo .gold { opacity: 1; }
 body.is-sold .gold, body.is-sold .canvas { opacity: 0; transition-delay: .3s; }
 
@@ -109,19 +109,21 @@ h1 b { font-weight: 600; }
 .bidding-copy { position: absolute; left: 0; right: 0; top: calc(640 * var(--u)); text-align: center; opacity: 0; transform: translateY(calc(20 * var(--u))); transition: opacity .5s, transform .5s; }
 body.bidding .bidding-copy { opacity: 1; transform: none; }
 body.is-sold .bidding-copy { opacity: 0; }
-.bidding-title { margin: 0; color: var(--red); font-weight: 400; font-size: calc(154 * var(--u)); line-height: 1; letter-spacing: -.06em; white-space: nowrap; }
-.caption { display: block; margin-top: calc(12 * var(--u)); font-size: calc(21 * var(--u)); color: #fff; letter-spacing: -.02em; min-height: 1.3em; font-variant-numeric: tabular-nums; }
+.bid-band { position: absolute; left: calc(180 * var(--u)); top: calc(51 * var(--u)); width: calc(1137 * var(--u)); height: calc(95 * var(--u)); background: rgba(0,0,0,.3); filter: blur(calc(81 * var(--u))); z-index: -1; }
+body.narrow .bid-band { display: none; }
+.bidding-title { margin: 0; color: var(--red); font-weight: 400; font-size: calc(150 * var(--u)); line-height: 1; letter-spacing: -.06em; white-space: nowrap; }
+.caption { display: block; margin-top: calc(18 * var(--u)); font-size: calc(21 * var(--u)); color: #fff; letter-spacing: -.02em; min-height: 1.3em; font-variant-numeric: tabular-nums; }
 
 /* ---------- SOLD end card ---------- */
 .sold { position: fixed; inset: 0; z-index: 20; opacity: 0; pointer-events: none; transition: opacity .6s; overflow: hidden; }
 body.is-sold .sold { opacity: 1; pointer-events: auto; }
 .sold-shade { position: absolute; left: 0; right: 0; top: calc(var(--uy) + 123 * var(--u)); height: calc(676 * var(--u)); background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.42) 15%, rgba(0,0,0,.55) 30%, rgba(0,0,0,.65) 45%, rgba(0,0,0,.72) 60%, rgba(0,0,0,.78) 75%, rgba(0,0,0,.85) 100%); }
 .bar { position: absolute; left: 0; right: 0; background: var(--black); }
-.bar.top { top: 0; height: calc(var(--uy) + 123 * var(--u)); }
-.bar.bottom { top: calc(var(--uy) + 799 * var(--u)); bottom: 0; display: grid; place-items: center; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 8px max(8px, env(safe-area-inset-bottom, 0px)); }
-.hush { position: absolute; left: calc(var(--ux) + 430 * var(--u)); top: calc(var(--uy) + 60 * var(--u)); width: calc(580 * var(--u)); height: calc(560 * var(--u)); background: radial-gradient(closest-side, #000 62%, rgba(0,0,0,0)); }
+.bar.top { top: 0; height: calc(var(--uy) + 185 * var(--u)); background: linear-gradient(180deg, var(--black) 0, var(--black) calc(var(--uy) + 150 * var(--u)), rgba(2,2,2,0) 100%); }
+.bar.bottom { top: calc(var(--uy) + 757 * var(--u)); bottom: 0; background: linear-gradient(180deg, rgba(2,2,2,0) 0, rgba(2,2,2,0) calc(42 * var(--u)), var(--black) calc(42 * var(--u))); display: grid; place-items: start center; align-content: start; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 8px max(8px, env(safe-area-inset-bottom, 0px)); }
+.hush { position: absolute; left: calc(var(--ux) + 393 * var(--u)); top: calc(var(--uy) + 149 * var(--u)); width: calc(668 * var(--u)); height: calc(668 * var(--u)); background: radial-gradient(closest-side, #000 50%, rgba(0,0,0,0)); }
 .sold-box { position: absolute; left: var(--ux); top: var(--uy); width: calc(1440 * var(--u)); height: calc(900 * var(--u)); }
-.lot { --s: var(--u); position: absolute; left: calc(503 * var(--u)); top: calc(222 * var(--u)); width: calc(470.35 * var(--s)); height: calc(430.6 * var(--s)); transform: scale(.75) rotate(4deg); opacity: 0; transition: transform .7s cubic-bezier(.2,.9,.25,1.2), opacity .4s; }
+.lot { --s: var(--u); position: absolute; left: calc(503 * var(--u)); top: calc(110 * var(--u)); width: calc(470.35 * var(--s)); height: calc(430.6 * var(--s)); transform: scale(.75) rotate(4deg); opacity: 0; transition: transform .7s cubic-bezier(.2,.9,.25,1.2), opacity .4s; }
 body.is-sold .lot { transform: none; opacity: 1; }
 .lot .photo { position: absolute; left: calc(77.8 * var(--s)); top: calc(131.5 * var(--s)); width: calc(326 * var(--s)); height: calc(219 * var(--s)); object-fit: cover; transform: rotate(-9.8deg); background: #111; }
 .lot .frame { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -129,14 +131,14 @@ body.is-sold .lot { transform: none; opacity: 1; }
 body.is-sold .plaque { transform: none; opacity: 1; }
 .plaque img { display: block; width: 100%; height: 100%; }
 .plaque .price { position: absolute; left: calc(84 * var(--s)); top: calc(102 * var(--s)); width: calc(100 * var(--s)); height: calc(40 * var(--s)); display: grid; place-items: center; font-family: var(--serif); font-weight: 500; font-size: calc(32 * var(--s)); color: var(--gold-ink); transform: rotate(-4.6deg); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.roast { position: absolute; left: calc(320 * var(--u)); width: calc(800 * var(--u)); top: calc(656 * var(--u)); margin: 0; text-align: center; color: var(--red); font-size: calc(22 * var(--u)); line-height: 1.15; text-wrap: balance; letter-spacing: -.045em; }
-.actions { position: absolute; left: calc(522 * var(--u)); top: calc(712 * var(--u)); display: flex; gap: calc(82.6 * var(--u)); }
+.roast { position: absolute; left: calc(320 * var(--u)); width: calc(800 * var(--u)); top: calc(598 * var(--u)); margin: 0; text-align: center; color: var(--red); font-size: calc(22 * var(--u)); line-height: 1.15; text-wrap: balance; letter-spacing: -.045em; }
+.actions { position: absolute; left: calc(522 * var(--u)); top: calc(647 * var(--u)); display: flex; gap: calc(82.6 * var(--u)); }
 .btn { width: calc(194.3 * var(--u)); height: calc(59.3 * var(--u)); font-size: calc(24 * var(--u)); letter-spacing: -.04em; border: 1px solid #fff; background: transparent; color: #fff; }
 .btn.primary { background: var(--red); border-color: var(--red); }
 .btn.primary:hover { background: var(--red-deep); border-color: var(--red-deep); }
 .btn:not(.primary) { color: var(--cream); border-color: var(--cream); }
 .btn:not(.primary):hover { background: rgba(255,255,255,.08); }
-.ente { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 18px; text-align: center; font-size: clamp(13px, 1.2vw, 16px); color: var(--ink-dim); max-width: 100%; }
+.ente { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: calc(5 * var(--u)) 18px; text-align: center; font-size: clamp(13px, 1.2vw, 16px); color: var(--ink-dim); max-width: 100%; }
 .ente b { color: #fff; font-weight: 600; }
 .ente a { color: #fff; background: none; border: 1px solid rgba(255,255,255,.5); padding: 7px 14px; text-decoration: none; white-space: nowrap; font-weight: 500; }
 .ente a:hover { background: #fff; color: #000; }
@@ -175,7 +177,7 @@ body.narrow .roast, body.narrow .actions { position: static; }
 body.narrow .roast { width: auto; font-size: 18px; max-width: 30em; margin-top: -8px; }
 body.narrow .actions { gap: 14px; }
 body.narrow .btn { width: 140px; height: 50px; font-size: 17px; }
-body.narrow .bar.bottom { position: relative; top: auto; flex: 1; display: flex; padding-block: 18px max(50px, calc(env(safe-area-inset-bottom, 0px) + 24px)); border-top: 1px solid #1c1c1c; }
+body.narrow .bar.bottom { position: relative; top: auto; background: var(--black); place-items: center; flex: 1; display: flex; padding-block: 18px max(50px, calc(env(safe-area-inset-bottom, 0px) + 24px)); border-top: 1px solid #1c1c1c; }
 body.narrow .ente { flex: 1; flex-direction: column; flex-wrap: nowrap; gap: 14px; }
 body.narrow .fine { margin-top: auto; padding-top: 24px; }
 
@@ -231,6 +233,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     </div>
   </div>
   <div class="bidding-copy" aria-live="polite">
+    <div class="bid-band"></div>
     <p class="bidding-title">Bidding in progress</p>
     <span class="caption" id="caption">The auctioneer is examining the lot…</span>
   </div>
