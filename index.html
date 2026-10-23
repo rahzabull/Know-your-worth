@@ -182,8 +182,15 @@ body.narrow .ui { left: 0; top: 0; width: 100%; height: 100%; }
 body.narrow .landing { position: absolute; left: 0; right: 0; top: calc(var(--fb) + 10px); bottom: 0; display: flex; flex-direction: column; gap: 14px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); padding-block: 0 max(73px, calc(env(safe-area-inset-bottom, 0px) + 40px)); }
 /* copy sits in the space between the frame and the links, a little above centre (as in Figma) */
 body.narrow .landing::before { content: ""; flex: 33 1 0; min-height: 6px; }
-body.narrow .landing .spacer { display: block; flex: 67 1 0; }
-.landing .spacer { display: none; }
+body.narrow .landing .spacer { position: relative; left: auto; top: auto; width: auto; height: auto; display: block; flex: 67 1 0; }
+/* Bidder chatter on the first screen: desktop sits over the crowd right of the headline, phones between the copy and the links */
+.landing .spacer { position: absolute; left: calc(860 * var(--u)); top: calc(270 * var(--u)); width: calc(540 * var(--u)); height: calc(220 * var(--u)); pointer-events: none; }
+.chat { position: absolute; width: max-content; max-width: calc(230 * var(--u)); padding: calc(8 * var(--u)) calc(12 * var(--u)); background: var(--cream); color: #141414; font-size: max(12px, calc(15 * var(--u))); line-height: 1.22; letter-spacing: -.02em; font-weight: 500; border-radius: calc(11 * var(--u)); box-shadow: 0 6px 18px rgba(0,0,0,.5); transform: translate(calc(-1 * var(--tail)), -100%) scale(.6); transform-origin: var(--tail) 100%; opacity: 0; transition: opacity .2s, transform .3s cubic-bezier(.2,1.4,.4,1); text-wrap: balance; }
+.chat.show { opacity: 1; transform: translate(calc(-1 * var(--tail)), -100%) scale(1); }
+.chat::after { content: ""; position: absolute; left: var(--tail); bottom: calc(-6 * var(--u)); width: calc(12 * var(--u)); height: calc(12 * var(--u)); background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+.chat .who { display: block; margin-bottom: 2px; font-size: .78em; font-weight: 600; color: var(--red-deep); letter-spacing: -.01em; }
+body.narrow .chat { max-width: 64%; font-size: 13.5px; padding: 7px 11px; border-radius: 10px; }
+body.narrow .chat::after { width: 11px; height: 11px; bottom: -5px; }
 body.narrow .sub { max-width: 325px; }
 body.narrow h1, body.narrow .sub, body.narrow .links { position: static; white-space: normal; }
 body.narrow h1 { font-size: clamp(44px, 14.4vw, 68px); line-height: .86; }
@@ -255,7 +262,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
   <div class="landing">
     <h1>What’s your<br>photo <b>worth?</b></h1>
     <p class="sub">Drop in a photo. Our AI reads it the way the ad industry would.</p>
-    <i class="spacer" aria-hidden="true"></i>
+    <div class="spacer" id="chatter" aria-hidden="true"></div>
     <div class="links">
       <button type="button" data-open-method>How we calculate this?</button>
       <a href="https://ente.com" target="_blank" rel="noopener">About Ente</a>
@@ -424,6 +431,64 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     });
   }
   addEventListener("resize", fit); fit();
+  /* ---------- Bidder chatter on the first screen, in a new random order on every visit ---------- */
+  const CHATTER = [
+    [["A", "Anyone else waiting for a photo?"], ["B", "Paddle’s been up since breakfast."]],
+    [["A", "Ten cents says it’s a sunset."], ["B", "Twenty says it’s a cat in a sunset."], ["Paws & Co.", "Thirty if it’s the cat."]],
+    [["A", "What are we bidding on today?"], ["B", "Whatever they upload. We’re not picky."], ["Paws & Co.", "Speak for yourself. I only buy dogs."]],
+    [["A", "Last one was a wedding. I paid $8."], ["B", "Worth it. They’re having a baby next year."]],
+    [["A", "Do they know we can see where photos are taken?"], ["B", "Shh. Don’t ruin it."]],
+    [["A", "I already know their shoe size."], ["B", "Creepy."], ["A", "Profitable."]],
+    [["A", "My algorithm says the next one’s a beach."], ["B", "Your algorithm says that every time."]],
+    [["A", "Who’s going first?"], ["B", "Not me. Still paying off the last selfie."]],
+    [["Paws & Co.", "Psst. Upload a pet. We go wild for pets."], ["B", "Calm down."]],
+    [["A", "Drag it in, we don’t bite."], ["B", "We just resell."]],
+    [["A", "I hope it’s brunch."], ["Crave Delivery", "Avocado toast? I’ll go to a dollar."]],
+    [["A", "Is the uploader nervous?"], ["B", "They should be."]],
+    [["A", "If the face is boring, I’ll bid on the background."], ["B", "Same. Love a good logo."]],
+    [["A", "Should we tell them Ente encrypts photos?"], ["B", "Absolutely not."]],
+    [["A", "New phone, new photos, new ads."], ["B", "The circle of life."]],
+    [["DriveNow Motors", "Bet it’s a car."], ["B", "You say that about every photo."]],
+    [["A", "Gary, nothing’s uploaded yet."], ["B", "I like to be ready."]],
+  ];
+  const CHAT_NAMES = ["Lifestyle Corp.", "DataMart", "ClickFlow Media", "BrightAds Network", "AudienceOne", "Wanderlust Travel", "SafeHome Insurance", "GadgetHub"];
+  // desktop: three spots over the crowd; phones: one bubble at a time, alternating sides
+  const CHAT_SPOTS = [[12, 40, 18], [88, 22, 82], [55, 88, 50]], PHONE_SPOTS = [[8, 100, 14], [92, 100, 86]];
+  const shuffled = (a) => a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(v => v[1]);
+  let chatQueue = [], chatTimer = 0, chatOn = false;
+  function chatLine(spot, who, text, keep) {
+    const box = $("chatter");
+    if (phone()) box.querySelectorAll(".chat.show").forEach(b => b.classList.remove("show"));
+    const b = document.createElement("div");
+    b.className = "chat";
+    b.innerHTML = `<span class="who">${esc(who)}</span>${esc(text)}`;
+    const [x, y, tail] = spot;
+    Object.assign(b.style, { left: x + "%", top: phone() ? `calc(${y}% - 12px)` : y + "%" });
+    b.style.setProperty("--tail", tail + "%");
+    box.appendChild(b);
+    requestAnimationFrame(() => requestAnimationFrame(() => b.classList.add("show")));
+    setTimeout(() => { b.classList.remove("show"); setTimeout(() => b.remove(), 400); }, keep);
+  }
+  function chatNext() {
+    if (!chatOn) return;
+    const box = $("chatter");
+    if (phone() && box.offsetHeight < 64) { chatTimer = setTimeout(chatNext, 2500); return; } // no room on very short screens
+    if (!chatQueue.length) chatQueue = shuffled(CHATTER);
+    const script = chatQueue.shift(), names = shuffled(CHAT_NAMES);
+    const spots = phone() ? PHONE_SPOTS : shuffled(CHAT_SPOTS);
+    const cast = {}; let n = 0;
+    script.forEach(([who]) => { if (!(who in cast)) cast[who] = { name: who.length > 1 ? who : names[n], spot: spots[n % spots.length] }, n++; });
+    let t = 0;
+    script.forEach(([who, text], i) => {
+      chatTimer = setTimeout(() => chatOn && chatLine(cast[who].spot, cast[who].name, text, phone() ? 2300 : 3600), t);
+      t += 2300;
+    });
+    chatTimer = setTimeout(chatNext, t + 1800);
+  }
+  function startChatter() { if (chatOn) return; chatOn = true; chatTimer = setTimeout(chatNext, 900); }
+  function stopChatter() { chatOn = false; clearTimeout(chatTimer); $("chatter").querySelectorAll(".chat").forEach(b => b.classList.remove("show")); }
+  startChatter();
+
   if (matchMedia("(pointer: coarse)").matches) $("dropText").innerHTML = "Tap to add a photo<small class=\"touch\">from your camera roll or camera</small>";
 
   /* ---------- Bidders and what they want ---------- */
@@ -770,6 +835,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     }
     $("soldImg").src = src;
     body.classList.add("has-photo", "bidding");
+    stopChatter();
     $("caption").textContent = "The auctioneer is examining the lot…";
     const stats = photoStats(img);
     let preds = null;
@@ -854,6 +920,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
   }
 
   function reset() {
+    setTimeout(startChatter, 700);
     body.classList.remove("is-sold", "bidding", "has-photo", "has-leak");
     $("tags").innerHTML = "";
     hush();
