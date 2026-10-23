@@ -35,11 +35,12 @@
   color-scheme: dark;
   --ink: #ffffff;
   --ink-dim: #a7a7a7;
-  --ink-faint: #a0a0a0;
+  --ink-faint: #788d8d;
   --room: #0f1110;
   --black: #050505;
-  --red: #ff3b3b;
-  --red-deep: #d92626;
+  --red: #f63434;
+  --red-deep: #d42222;
+  --cream: #fff9f0;
   --gold-ink: #f3dca4;
   --paper: #eee6da;
   --display: "Inter Tight", "Helvetica Neue", Arial, sans-serif;
@@ -76,6 +77,7 @@ body.has-photo .canvas img { opacity: 1; }
 body.dragging .drop { background: #1c0606; border-color: var(--red); }
 body.has-photo .drop { opacity: 0; pointer-events: none; }
 .drop-title { position: absolute; left: calc(37 * var(--k)); top: calc(30 * var(--k)); display: flex; gap: calc(13 * var(--k)); align-items: flex-start; }
+.drop-title small.touch { font-size: calc(10.5 * var(--k)); margin-top: calc(7 * var(--k)); }
 .drop-title svg { width: calc(12 * var(--k)); height: calc(18 * var(--k)); flex: none; margin-top: calc(1 * var(--k)); }
 .drop-title span { font-size: calc(17 * var(--k)); line-height: calc(15 * var(--k)); letter-spacing: -.02em; color: #fff; }
 .drop-title small { display: block; margin-top: calc(5 * var(--k)); font-size: calc(12.4 * var(--k)); line-height: calc(12 * var(--k)); letter-spacing: -.03em; color: #d9d9d9; }
@@ -132,6 +134,7 @@ body.is-sold .plaque { transform: none; opacity: 1; }
 .btn { width: calc(194.3 * var(--u)); height: calc(59.3 * var(--u)); font-size: calc(24 * var(--u)); letter-spacing: -.04em; border: 1px solid #fff; background: transparent; color: #fff; }
 .btn.primary { background: var(--red); border-color: var(--red); }
 .btn.primary:hover { background: var(--red-deep); border-color: var(--red-deep); }
+.btn:not(.primary) { color: var(--cream); border-color: var(--cream); }
 .btn:not(.primary):hover { background: rgba(255,255,255,.08); }
 .ente { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 18px; text-align: center; font-size: clamp(13px, 1.2vw, 16px); color: var(--ink-dim); max-width: 100%; }
 .ente b { color: #fff; font-weight: 600; }
@@ -151,25 +154,30 @@ body.is-sold .plaque { transform: none; opacity: 1; }
 
 /* ---------- Narrow screens: stack the copy ---------- */
 body.narrow .ui { left: 0; top: 0; width: 100%; height: 100%; }
-body.narrow .landing { position: absolute; left: 0; right: 0; bottom: 0; display: grid; gap: 14px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); padding-block: 0 max(30px, env(safe-area-inset-bottom, 0px)); }
+body.narrow .landing { position: absolute; left: 0; right: 0; top: 50.5%; bottom: 0; display: flex; flex-direction: column; gap: 14px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); padding-block: 0 max(66px, calc(env(safe-area-inset-bottom, 0px) + 40px)); }
+body.narrow .links { margin-top: auto; }
 body.narrow h1, body.narrow .sub, body.narrow .links { position: static; white-space: normal; }
-body.narrow h1 { font-size: clamp(50px, 15vw, 76px); line-height: .95; }
-body.narrow .sub { font-size: 18px; line-height: 1.3; }
-body.narrow .links { font-size: 16px; gap: 10px 20px; flex-wrap: wrap; }
-@media (max-height: 700px) { body.narrow h1 { font-size: 46px; } body.narrow .sub { font-size: 16px; } body.narrow .landing { gap: 10px; } }
+body.narrow h1 { font-size: clamp(44px, 14.4vw, 68px); line-height: .86; }
+body.narrow .sub { font-size: clamp(17px, 5.1vw, 22px); line-height: 1.1; }
+body.narrow .links { font-size: clamp(16px, 4.6vw, 20px); gap: 10px 32px; flex-wrap: wrap; }
+@media (max-height: 700px) { body.narrow h1 { font-size: 46px; } body.narrow .sub { font-size: 16px; } body.narrow .landing { gap: 10px; top: 47%; padding-bottom: 28px; } }
 .links > * { white-space: nowrap; }
-body.narrow .bidding-copy { top: auto; bottom: max(36px, env(safe-area-inset-bottom, 0px)); padding-inline: 16px; }
-body.narrow .bidding-title { font-size: clamp(40px, 12.5vw, 64px); white-space: normal; line-height: .95; }
-body.narrow .caption { font-size: 16px; margin-top: 14px; }
-body.narrow .sold { overflow-y: auto; background: var(--black); }
+body.narrow .bidding-copy { top: 0; bottom: 0; padding-inline: 10px; }
+body.narrow .bidding-title { position: absolute; left: 10px; right: 10px; top: 15.5%; }
+body.narrow .caption { position: absolute; left: 20px; right: 20px; top: 85.7%; }
+body.narrow .bidding-title { font-size: clamp(40px, 13.8vw, 64px); white-space: normal; line-height: .95; }
+body.narrow .caption { font-size: 15px; margin-top: 0; }
+body.narrow .sold { overflow-y: auto; background: var(--black); display: flex; flex-direction: column; }
 body.narrow .sold-shade, body.narrow .hush, body.narrow .bar.top { display: none; }
-body.narrow .sold-box { position: relative; left: 0; top: 0; width: 100%; height: auto; display: grid; justify-items: center; gap: 22px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: max(48px, env(safe-area-inset-top, 0px)) 24px; }
-body.narrow .lot { --s: calc(min(88vw, 470px) / 470.35); position: relative; left: auto; top: auto; }
+body.narrow .sold-box { position: relative; left: 0; top: 0; width: 100%; height: auto; display: grid; justify-items: center; gap: 22px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: max(84px, calc(env(safe-area-inset-top, 0px) + 40px)) 24px; flex: none; }
+body.narrow .lot { --s: calc(min(88vw, 470px) / 470.35); position: relative; left: -2vw; top: -10px; }
 body.narrow .roast, body.narrow .actions { position: static; }
 body.narrow .roast { width: auto; font-size: 18px; max-width: 30em; margin-top: -8px; }
 body.narrow .actions { gap: 14px; }
 body.narrow .btn { width: 140px; height: 50px; font-size: 17px; }
-body.narrow .bar.bottom { position: relative; top: auto; padding-block: 18px max(24px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid #1c1c1c; }
+body.narrow .bar.bottom { position: relative; top: auto; flex: 1; display: flex; padding-block: 18px max(50px, calc(env(safe-area-inset-bottom, 0px) + 24px)); border-top: 1px solid #1c1c1c; }
+body.narrow .ente { flex: 1; flex-direction: column; flex-wrap: nowrap; gap: 14px; }
+body.narrow .fine { margin-top: auto; padding-top: 24px; }
 
 /* ---------- Method sheet ---------- */
 .sheet { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.72); display: grid; place-items: center; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 24px; }
@@ -220,7 +228,6 @@ body.narrow .bar.bottom { position: relative; top: auto; padding-block: 18px max
     <div class="links">
       <button type="button" data-open-method>How we calculate this?</button>
       <a href="https://ente.com" target="_blank" rel="noopener">About Ente</a>
-      <button type="button" id="sampleBtn">Try a sample</button>
     </div>
   </div>
   <div class="bidding-copy" aria-live="polite">
@@ -356,7 +363,7 @@ body.narrow .bar.bottom { position: relative; top: auto; padding-block: 18px max
     });
   }
   addEventListener("resize", fit); fit();
-  if (matchMedia("(pointer: coarse)").matches) $("dropText").innerHTML = "Tap to add a photo<small>from your camera roll or camera</small>";
+  if (matchMedia("(pointer: coarse)").matches) $("dropText").innerHTML = "Tap to add a photo<small class=\"touch\">from your camera roll or camera</small>";
 
   /* ---------- Bidders and what they want ---------- */
   const dogs = [], cats = [];
@@ -597,7 +604,6 @@ body.narrow .bar.bottom { position: relative; top: auto; padding-block: 18px max
   $("pickBtn").addEventListener("click", (e) => { e.stopPropagation(); $("fileInput").click(); });
   $("drop").addEventListener("click", () => $("fileInput").click());
   $("fileInput").addEventListener("change", (e) => useFile(e.target.files[0]));
-  $("sampleBtn").addEventListener("click", () => auction(IMG.sample));
   $("retryBtn").addEventListener("click", reset);
 
   let dragDepth = 0;
@@ -624,7 +630,7 @@ body.narrow .bar.bottom { position: relative; top: auto; padding-block: 18px max
     const g = x.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, "rgba(0,0,0,.55)"); g.addColorStop(.45, "rgba(0,0,0,.6)"); g.addColorStop(.75, "rgba(0,0,0,.85)"); g.addColorStop(1, "rgba(0,0,0,.96)");
     x.fillStyle = g; x.fillRect(0, 0, W, H);
-    const s = 2.0, lx = (W - 470.35 * s) / 2, ly = 120;
+    const s = 2.0, lx = 57, ly = 180;
     x.save(); x.translate(lx, ly); x.scale(s, s);
     x.save(); x.translate(240.8, 241); x.rotate(-9.8 * Math.PI / 180);
     const pw = 326, ph = 219, r = Math.max(pw / photo.naturalWidth, ph / photo.naturalHeight);
@@ -640,7 +646,7 @@ body.narrow .bar.bottom { position: relative; top: auto; padding-block: 18px max
     x.textAlign = "center"; x.textBaseline = "alphabetic";
     x.fillStyle = "#ff3b3b"; x.font = "400 42px 'Inter Tight', Arial, sans-serif";
     const lines = wrap(x, $("roast").textContent, 900);
-    lines.forEach((l, i) => x.fillText(l, W / 2, 1050 + i * 52));
+    lines.forEach((l, i) => x.fillText(l, W / 2, 1024 + i * 52));
     x.textAlign = "left"; x.fillStyle = "#fff"; x.font = "300 50px 'Inter Tight', Arial, sans-serif";
     x.fillText("What’s your photo", 70, 1250);
     const w1 = x.measureText("What’s your photo ").width; x.font = "600 50px 'Inter Tight', Arial, sans-serif"; x.fillText("worth?", 70 + w1, 1250);
