@@ -21,6 +21,7 @@
 <meta name="twitter:image" content="https://rahzabull.github.io/Know-your-worth/assets/img/og.jpg">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<script type="importmap">{"imports":{"@tensorflow/tfjs/dist/index.js":"./assets/js/tf-shim.js","@tensorflow/tfjs-backend-webgl/dist/index.js":"./assets/js/tf-empty.js","@tensorflow/tfjs-backend-wasm/dist/index.js":"./assets/js/tf-empty.js"}}</script>
 <link rel="preload" href="assets/img/room.jpg" as="image">
 <link rel="preload" href="assets/fonts/inter-tight-300.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -132,7 +133,17 @@ body.is-sold .plaque { transform: none; opacity: 1; }
 .plaque img { display: block; width: 100%; height: 100%; }
 .plaque .price { position: absolute; left: calc(84 * var(--s)); top: calc(102 * var(--s)); width: calc(100 * var(--s)); height: calc(40 * var(--s)); display: grid; place-items: center; font-family: var(--serif); font-weight: 500; font-size: calc(32 * var(--s)); color: var(--gold-ink); transform: rotate(-4.6deg); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .roast { position: absolute; left: calc(320 * var(--u)); width: calc(800 * var(--u)); top: calc(598 * var(--u)); margin: 0; text-align: center; color: var(--red); font-size: calc(22 * var(--u)); line-height: 1.15; text-wrap: balance; letter-spacing: -.045em; }
-.actions { position: absolute; left: calc(522 * var(--u)); top: calc(647 * var(--u)); display: flex; gap: calc(82.6 * var(--u)); }
+.actions { position: absolute; left: calc(522 * var(--u)); top: calc(647 * var(--u)); display: flex; gap: calc(82.6 * var(--u)); transition: top .3s; }
+.leak { position: absolute; left: calc(270 * var(--u)); width: calc(900 * var(--u)); top: calc(632 * var(--u)); margin: 0; text-align: center; color: #d8d8d8; font-size: calc(16 * var(--u)); line-height: 1.35; letter-spacing: -.02em; text-wrap: balance; }
+.leak b { color: #fff; font-weight: 600; }
+.leak .up { color: var(--gold-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+body.has-leak .actions { top: calc(684 * var(--u)); }
+.tags { position: absolute; left: calc(77.8 * var(--s)); top: calc(131.5 * var(--s)); width: calc(326 * var(--s)); height: calc(219 * var(--s)); transform: rotate(-9.8deg); pointer-events: none; }
+.tag { position: absolute; transform: translate(-50%, -100%); background: var(--red); color: #fff; font-weight: 700; font-size: calc(12 * var(--s)); line-height: 1; padding: calc(4 * var(--s)) calc(6 * var(--s)); white-space: nowrap; font-variant-numeric: tabular-nums; opacity: 0; transition: opacity .3s; }
+body.is-sold .tag { opacity: 1; transition-delay: 1.1s; }
+.tag.top { background: var(--gold-ink); color: #2a1a00; }
+.challenge { position: absolute; left: calc(153 * var(--u)); top: calc(402 * var(--u)); margin: 0; display: inline-block; padding: calc(8 * var(--u)) calc(14 * var(--u)); background: rgba(0,0,0,.55); border: 1px solid var(--red); color: #fff; font-size: calc(19 * var(--u)); letter-spacing: -.02em; white-space: nowrap; }
+.challenge b { color: var(--red); font-weight: 600; }
 .btn { width: calc(194.3 * var(--u)); height: calc(59.3 * var(--u)); font-size: calc(24 * var(--u)); letter-spacing: -.04em; border: 1px solid #fff; background: transparent; color: #fff; }
 .btn.primary { background: var(--red); border-color: var(--red); }
 .btn.primary:hover { background: var(--red-deep); border-color: var(--red-deep); }
@@ -146,7 +157,14 @@ body.is-sold .plaque { transform: none; opacity: 1; }
 .fine button { background: none; border: 0; padding: 0; color: #9a9a9a; text-decoration: underline; text-underline-offset: 2px; font-size: inherit; }
 .share-card { display: grid; gap: 14px; }
 .share-card h2 { margin: 0; }
-.share-card img { width: 100%; max-height: 52vh; object-fit: contain; background: #000; }
+.tabs { display: flex; gap: 0; border: 1px solid #333; align-self: start; justify-self: start; }
+.tab { background: none; border: 0; color: #9a9a9a; padding: 8px 16px; font-size: 15px; }
+.tab[aria-selected="true"] { background: #fff; color: #000; }
+.preview { position: relative; display: grid; place-items: center; background: #000; height: min(46vh, 468px); }
+.preview img, .preview video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
+.rec { margin: 0; color: #bdbdbd; font-size: 15px; animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: .45; } }
+.pill:disabled { opacity: .5; }
 .share-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .pill { display: inline-block; padding: 9px 14px; font-size: 15px; border: 1px solid #555; background: transparent; color: #fff; text-decoration: none; }
 .pill:hover { border-color: #fff; }
@@ -175,6 +193,8 @@ body.narrow .sold-box { position: relative; left: 0; top: 0; width: 100%; height
 body.narrow .lot { --s: calc(min(88vw, 470px) / 470.35); position: relative; left: -2vw; top: -10px; }
 body.narrow .roast, body.narrow .actions { position: static; }
 body.narrow .roast { width: auto; font-size: 18px; max-width: 30em; margin-top: -8px; }
+body.narrow .leak { position: static; width: auto; max-width: 30em; font-size: 14px; margin-top: -10px; }
+body.narrow .challenge { position: static; align-self: flex-start; font-size: 14px; padding: 7px 11px; white-space: normal; order: -1; }
 body.narrow .actions { gap: 14px; }
 body.narrow .btn { width: 140px; height: 50px; font-size: 17px; }
 body.narrow .bar.bottom { position: relative; top: auto; background: var(--black); place-items: center; flex: 1; display: flex; padding-block: 18px max(50px, calc(env(safe-area-inset-bottom, 0px) + 24px)); border-top: 1px solid #1c1c1c; }
@@ -225,6 +245,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
 
 <div class="ui" id="ui">
   <div class="landing">
+    <p class="challenge" id="challenge" hidden></p>
     <h1>What’s your<br>photo <b>worth?</b></h1>
     <p class="sub">Drop in a photo. Our AI reads it the way the ad industry would.</p>
     <div class="links">
@@ -246,10 +267,12 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
   <div class="sold-box">
     <div class="lot">
       <img class="photo" id="soldImg" alt="Your photo">
+      <div class="tags" id="tags"></div>
       <img class="frame" src="assets/img/frame.webp" alt="">
       <div class="plaque"><img src="assets/img/plaque.webp" alt="SOLD"><span class="price" id="soldPrice">$0.00</span></div>
     </div>
     <p class="roast" id="roast"></p>
+    <p class="leak" id="leak" hidden></p>
     <div class="actions">
       <button class="btn primary" id="shareBtn" type="button">Share</button>
       <button class="btn" id="retryBtn" type="button">Retry</button>
@@ -276,7 +299,8 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       <tr><td>Buying signals</td><td>Travel, cars, a home</td><td>$0.50 to $2</td></tr>
       <tr><td>Life events</td><td>A wedding, a baby, a move</td><td>$2 to $9</td></tr>
     </table>
-    <p style="margin-top:12px">Advertisers pay the most for people whose spending is about to change, which is why life events jump in price. The tiers reflect how ad pricing works in general; the exact amounts are illustrative, not real quotes.</p>
+    <p style="margin-top:12px">We also read the hidden details saved inside the file, like where and when it was taken and on which phone. Location raises the price most, because advertisers pay extra for it. This happens on your device too, and we never put your location on the share card.</p>
+    <p>Advertisers pay the most for people whose spending is about to change, which is why life events jump in price. The tiers reflect how ad pricing works in general; the exact amounts are illustrative, not real quotes.</p>
     <h3>What we never guess</h3>
     <p>Age, gender, ethnicity, health, religion, sexuality or anything about children. The model here can't, and we wouldn't want it to.</p>
     <h3>Why Ente made this</h3>
@@ -288,7 +312,16 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
 <div class="sheet" id="shareSheet" hidden role="dialog" aria-modal="true" aria-labelledby="shareTitle">
   <div class="sheet-card share-card">
     <h2 id="shareTitle">Share your sale</h2>
-    <img id="cardPreview" alt="Your SOLD card">
+    <div class="tabs" id="shareTabs" role="tablist" aria-label="Format">
+      <button type="button" class="tab" role="tab" data-fmt="post" aria-selected="true">Post</button>
+      <button type="button" class="tab" role="tab" data-fmt="story" aria-selected="false">Story</button>
+      <button type="button" class="tab" role="tab" data-fmt="video" aria-selected="false">Video</button>
+    </div>
+    <div class="preview">
+      <img id="cardPreview" alt="Your SOLD card">
+      <video id="vidPreview" playsinline muted loop hidden></video>
+      <p class="rec" id="recNote" hidden></p>
+    </div>
     <div class="share-row">
       <button type="button" class="pill solid" id="dlBtn">Download image</button>
       <button type="button" class="pill" id="copyBtn">Copy text</button>
@@ -306,7 +339,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
 <script src="assets/js/tf.min.js"></script>
 <script>
 (() => {
-  const SHARE_URL = location.href.split("#")[0].split("?")[0];
+  const SHARE_URL = location.href.split(/[?#]/)[0].replace(/index\.html$/, "");
   const IMG = { sample: "assets/img/sample.jpg", arms: { A: "assets/img/armA.webp", B: "assets/img/armB.webp", C: "assets/img/armC.webp", D: "assets/img/armD.webp", E: "assets/img/armE.webp" } };
   const $ = (id) => document.getElementById(id);
   const body = document.body;
@@ -397,6 +430,82 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     { key: "x3", bidder: "ClickFlow Media", reason: "the lighting", lo: 0.10, hi: 0.40 },
     { key: "x4", bidder: "AudienceOne", reason: "the details", lo: 0.10, hi: 0.35 },
   ];
+
+  // Rare outcomes, about 1 photo in 12
+  const RARE = [
+    { key: "r1", bidder: "your ex’s new partner’s startup", reason: "old times’ sake", roast: "Congrats, you’re sold to your ex’s new partner’s startup. They said thanks." },
+    { key: "r2", bidder: "an AI training dataset", reason: "a face it can reuse", roast: "Congrats, you’re sold to an AI training set. See you in a stock photo in 2031." },
+    { key: "r3", bidder: "five data brokers at once", reason: "a bundle deal", roast: "Congrats, you’re sold to five data brokers at once. They’ll resell you by lunch." },
+    { key: "r4", bidder: "a mattress brand", reason: "your sleep schedule", roast: "Congrats, you’re sold to a mattress brand. They’ve seen what time you’re up." },
+    { key: "r5", bidder: "your mom’s Facebook group", reason: "the comments section", roast: "Congrats, you’re sold to your mom’s Facebook group. It’s been shared 40 times." },
+  ];
+
+  /* ---------- What the file itself gives away (EXIF), read on the device ---------- */
+  const loadScript = (src) => new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+  async function nearestPlace(lat, lng) {
+    try {
+      const base = new URL("assets/geo/", document.baseURI).href;
+      const index = await fetch(base + "index.json").then(r => r.json());
+      const keys = [];
+      for (const dy of [-5, 0, 5]) for (const dx of [-5, 0, 5]) {
+        const k = `${Math.floor(lat / 5) * 5 + dy}_${Math.floor(lng / 5) * 5 + dx}`;
+        if (index.includes(k)) keys.push(k);
+      }
+      const rows = (await Promise.all(keys.map(k => fetch(base + k + ".json").then(r => r.json())))).flat();
+      let best = null, bd = Infinity;
+      const cl = Math.cos(lat * Math.PI / 180);
+      for (const r of rows) { const d = (r[1] - lat) ** 2 + ((r[2] - lng) * cl) ** 2; if (d < bd) { bd = d; best = r; } }
+      if (!best) return null;
+      let where = best[0];
+      if (best[3] === "US" && best[4]) where += ", " + best[4];
+      else { try { where += ", " + new Intl.DisplayNames(["en"], { type: "region" }).of(best[3]); } catch (e) {} }
+      return where;
+    } catch (e) { return null; }
+  }
+  async function readMeta(file) {
+    if (!file) return null;
+    try {
+      if (!window.exifr) await loadScript(new URL("assets/js/exifr.js", document.baseURI).href);
+      const m = await exifr.parse(file, { gps: true, tiff: true, exif: true, xmp: false, icc: false, iptc: false });
+      if (!m) return null;
+      const out = { items: [], bump: 0 };
+      if (typeof m.latitude === "number" && typeof m.longitude === "number" && (m.latitude || m.longitude)) {
+        out.gps = { lat: m.latitude, lng: m.longitude };
+        out.place = await nearestPlace(m.latitude, m.longitude);
+        out.items.push(out.place ? `taken near <b>${esc(out.place)}</b>` : `exact GPS coordinates`);
+        out.bump += 0.38;
+      }
+      const when = m.DateTimeOriginal || m.CreateDate;
+      if (when instanceof Date && !isNaN(when)) {
+        const h = when.getHours(), late = h >= 22 || h < 5;
+        const day = when.toLocaleDateString("en-US", { weekday: "long" });
+        const time = when.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }).replace(" ", "").toLowerCase();
+        out.items.push(`<b>${day}, ${time}</b>`);
+        out.bump += late ? 0.17 : 0.06;
+        out.late = late;
+      }
+      if (m.Model) {
+        const make = (m.Make || "").trim(), model = String(m.Model).trim();
+        const cam = model.toLowerCase().startsWith(make.toLowerCase().split(" ")[0]) || /iphone|pixel|galaxy/i.test(model) ? model : (make + " " + model).trim();
+        out.items.push(`on an <b>${esc(cam)}</b>`);
+        out.bump += /iphone 1[3-9] pro|iphone 1[6-9]|galaxy s2|pixel [7-9]|pixel 1\d/i.test(cam) ? 0.21 : 0.05;
+      }
+      if (!out.items.length) return null;
+      out.bump = Math.round(out.bump * 100) / 100;
+      return out;
+    } catch (e) { return null; }
+  }
+  const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  /* ---------- Faces, for group photos (web build only) ---------- */
+  async function findFaces(img) {
+    try {
+      await loadModel();
+      const mod = await import(new URL("assets/js/face.js", document.baseURI).href);
+      const boxes = await mod.detect(img);
+      return boxes.filter(b => b.width > img.naturalWidth * 0.03).slice(0, 8);
+    } catch (e) { return []; }
+  }
 
   /* ---------- The model, loaded quietly in the background ---------- */
   let classes = null, modelP = null;
@@ -495,6 +604,11 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       if (bidders.length >= 5) break;
       bidders.push({ ...x, max: Math.round((x.lo + (x.hi - x.lo) * rand()) * 100) / 100 });
     }
+    // a rare bidder sometimes swoops in at the top
+    if (rand() < 1 / 12) {
+      const r = RARE[Math.floor(rand() * RARE.length)];
+      bidders.unshift({ ...r, rare: true, max: Math.round((bidders[0].max * 1.25 + 0.35) * 100) / 100 });
+    }
     return { bidders: bidders.slice(0, 5), rand };
   }
 
@@ -505,7 +619,8 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
 
   /* ---------- The auction: bidders raise their paddles in turn ---------- */
   async function runAuction(result) {
-    const { bidders, rand } = result;
+    const { bidders, rand, notes = [] } = result;
+    const history = [];
     // seat bidders on the five arms in a shuffled order
     const seats = [0, 1, 2, 3, 4].sort(() => rand() - 0.5);
     const arm = (i) => armEls[seats[i]];
@@ -522,6 +637,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       arm(i).querySelector(".num").textContent = money(price);
       arm(i).classList.add("up", "lead");
       caption.textContent = line;
+      history.push({ price, bidder: bidders[i].bidder, seat: seats[i] });
     };
     let guard = 0;
     while (guard++ < 12) {
@@ -533,6 +649,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       if (able.length === 1 && i === 0) p = bidders[0].max;
       await bid(i, p, `${cap(words(p))} from ${bidders[i].bidder}, for ${bidders[i].reason}!`);
       await sleep(950 + rand() * 450);
+      if (notes.length && history.length <= 2) { caption.textContent = notes.shift(); await sleep(1500); }
     }
     if (leader !== 0) {
       await bid(0, bidders[0].max, `${bidders[0].bidder} jumps in at ${money(bidders[0].max)}!`);
@@ -546,12 +663,12 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     caption.textContent = "Going once…"; await sleep(800);
     caption.textContent = "Going twice…"; await sleep(800);
     caption.textContent = "Sold!"; await sleep(500);
-    return { price, winner: bidders[0] };
+    return { price, winner: bidders[0], history };
   }
 
   /* ---------- Flow ---------- */
-  let busy = false, lastShare = "", lastSale = null, cardBlob = null;
-  async function auction(src) {
+  let busy = false, lastShare = "", lastSale = null;
+  async function auction(src, file) {
     if (busy) return;
     busy = true;
     const img = $("lotImg");
@@ -567,19 +684,82 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     const stats = photoStats(img);
     let preds = null;
     const minWait = sleep(1600);
+    const metaP = readMeta(file), facesP = findFaces(img);
     try { preds = await classify(img); } catch (e) { preds = null; }
+    const [meta, found] = await Promise.all([metaP, facesP]);
+    const faces = found.map(f => facePoint(f, img)).filter(Boolean);
     await minWait;
     const result = appraise(preds, stats);
-    const { price, winner } = await runAuction(result);
-    showSold(price, winner, !preds);
+    result.notes = [];
+    const lead = result.bidders[0];
+    if (meta) {
+      lead.max = Math.round((lead.max + meta.bump) * 100) / 100;
+      result.notes.push(meta.place ? `The file says it was taken near ${meta.place}. The room leans in.` : "The file has hidden details in it. The room leans in.");
+      // with a location, a nearby bidder sometimes takes it
+      if (meta.gps && !lead.rare && result.rand() < 0.5) {
+        const miles = (0.4 + result.rand() * 3.2).toFixed(1);
+        result.bidders[0] = { ...lead, key: "local", bidder: `a data broker ${miles} miles from where this was taken`, reason: "the location", roast: `Congrats, you’re sold to a data broker ${miles} miles from where this was taken.` };
+      }
+    }
+    if (faces.length >= 2) result.notes.push(`Group lot! ${faces.length} faces. Each one sells separately.`);
+    const sale = await runAuction(result);
+    showSold(sale, { meta, faces, basic: !preds, rand: result.rand });
     busy = false;
   }
 
-  function showSold(price, winner, basic) {
+  // where a face lands inside the SOLD photo (326x219, cropped to cover); null when cropped out
+  function facePoint(f, img) {
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    const r = Math.max(326 / iw, 219 / ih), ox = (326 - iw * r) / 2, oy = (219 - ih * r) / 2;
+    const x = (f.x + f.width / 2) * r + ox, y = f.y * r + oy;
+    return x < 6 || x > 320 || y < 12 || y > 219 ? null : { x, y };
+  }
+  function placeTags(faces, rand, price) {
+    const tags = $("tags"); tags.innerHTML = "";
+    if (faces.length < 2) return price;
+    const each = faces.map(() => Math.round(price * (0.55 + rand() * 0.6) * 100) / 100);
+    const total = Math.round(each.reduce((a, b) => a + b, 0) * 100) / 100;
+    const top = each.indexOf(Math.max(...each));
+    faces.forEach(({ x, y }, i) => {
+      const el = document.createElement("span");
+      el.className = "tag" + (i === top ? " top" : "");
+      el.textContent = money(each[i]);
+      el.style.left = (x / 326 * 100) + "%"; el.style.top = (y / 219 * 100) + "%";
+      tags.appendChild(el);
+    });
+    return total;
+  }
+
+  // a friend's price, from a shared challenge link (?beat=2.45&by=...)
+  const challenge = (() => {
+    const q = new URLSearchParams(location.search), v = parseFloat(q.get("beat"));
+    if (!(v > 0 && v < 100)) return null;
+    return { price: Math.round(v * 100) / 100, by: (q.get("by") || "").slice(0, 60).replace(/\.$/, "") };
+  })();
+  if (challenge) {
+    const c = $("challenge");
+    c.innerHTML = `A friend’s photo sold for <b>${money(challenge.price)}</b>${challenge.by ? " to " + esc(challenge.by) : ""}. Can you beat it?`;
+    c.hidden = false;
+  }
+
+  function showSold(sale, extra) {
+    const { winner } = sale, { meta, faces, basic, rand } = extra;
+    const price = placeTags(faces, rand, sale.price);
+    lastSale = { price, winner, rare: !!winner.rare, group: faces.length >= 2 ? faces.length : 0, history: sale.history };
     $("soldPrice").textContent = money(price);
     $("roast").textContent = winner.roast || `Congrats, you’re sold to ${winner.bidder}. Mom will be proud.`;
-    lastShare = `I just got auctioned off to ${winner.bidder} for ${money(price)}. What's your photo worth?`;
-    lastSale = { price, winner };
+    const bits = [];
+    if (challenge) {
+      const d = Math.round((price - challenge.price) * 100) / 100;
+      bits.push(d > 0 ? `<b>You beat your friend by ${money(d)}.</b>` : d < 0 ? `<b>Your friend’s photo fetched ${money(-d)} more. Ouch.</b>` : `<b>Dead heat with your friend.</b>`);
+    }
+    if (lastSale.group) bits.push(`Group lot: ${lastSale.group} faces sold separately.`);
+    if (meta) bits.push(`The file also gave away: ${meta.items.join(", ")} <span class="up">(+${money(meta.bump)})</span>`);
+    else if (winner.rare) bits.push(`<b>Rare sale.</b> About 1 in 12 photos gets this bidder.`);
+    $("leak").innerHTML = bits.join(" ");
+    $("leak").hidden = !bits.length;
+    body.classList.toggle("has-leak", bits.length > 0);
+    lastShare = (challenge && price > challenge.price ? `I beat my friend’s photo. ` : "") + `My photo just sold to ${winner.bidder} for ${money(price)}. Can you beat it?`;
     $("fine").firstChild.textContent = (basic ? "Quick estimate from colours only, because the recogniser didn't load. " : "") + "Illustrative estimate. No real auction took place and nothing was sold. ";
     body.classList.add("is-sold");
     $("sold").scrollTop = 0;
@@ -587,7 +767,8 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
   }
 
   function reset() {
-    body.classList.remove("is-sold", "bidding", "has-photo");
+    body.classList.remove("is-sold", "bidding", "has-photo", "has-leak");
+    $("tags").innerHTML = "";
     armEls.forEach(a => a.classList.remove("up", "lead"));
     $("fileInput").value = "";
     setTimeout(() => { $("lotImg").removeAttribute("src"); }, 600);
@@ -599,7 +780,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     if (!/^image\//.test(file.type) && !/\.(jpe?g|png|webp|gif|heic|avif)$/i.test(file.name)) { toast("That isn't a photo. Try a JPG or PNG."); return; }
     // Read as a data: URL; the artifact frame does not allow blob: images
     const r = new FileReader();
-    r.onload = () => auction(r.result);
+    r.onload = () => auction(r.result, file);
     r.onerror = () => toast("That file didn't open. Try a JPG or PNG.");
     r.readAsDataURL(file);
   }
@@ -616,69 +797,189 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
   addEventListener("drop", (e) => { e.preventDefault(); dragDepth = 0; body.classList.remove("dragging"); if (!busy && !body.classList.contains("is-sold")) useFile(e.dataTransfer.files[0]); });
   addEventListener("paste", (e) => { const f = [...(e.clipboardData?.files || [])][0]; if (f && !busy && !body.classList.contains("is-sold")) useFile(f); });
 
-  /* ---------- Share: a 1080x1350 SOLD card drawn on canvas ---------- */
+  /* ---------- Share: post card (4:5), story card (9:16) and a replay video, drawn on canvas ---------- */
   const loadImg = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
   function wrap(x, text, maxW) {
     const out = []; let line = "";
     for (const w of text.split(" ")) { const t = line ? line + " " + w : w; if (x.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; }
     if (line) out.push(line); return out;
   }
-  async function makeCard() {
-    const [room, frame, plaque, photo] = await Promise.all([loadImg("assets/img/room.jpg"), loadImg("assets/img/frame.webp"), loadImg("assets/img/plaque.webp"), loadImg($("soldImg").src)]);
-    await Promise.all(["300 40px 'Inter Tight'", "600 40px 'Inter Tight'", "500 40px Cinzel"].map(f => document.fonts.load(f).catch(() => {})));
-    const W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H;
-    const x = c.getContext("2d");
+  const LAYOUT = {
+    post: { W: 1080, H: 1350, lx: 57, ly: 180, roastY: 1024, footY: 1250 },
+    story: { W: 1080, H: 1920, lx: 57, ly: 420, roastY: 1300, footY: 1770 },
+  };
+  let art = null;
+  async function loadArt() {
+    if (!art) {
+      const [room, frame, plaque] = await Promise.all([loadImg("assets/img/room.jpg"), loadImg("assets/img/frame.webp"), loadImg("assets/img/plaque.webp")]);
+      await Promise.all(["300 40px 'Inter Tight'", "400 40px 'Inter Tight'", "600 40px 'Inter Tight'", "700 40px 'Inter Tight'", "500 40px Cinzel"].map(f => document.fonts.load(f).catch(() => {})));
+      art = { room, frame, plaque };
+    }
+    return { ...art, photo: await loadImg($("soldImg").src) };
+  }
+  const shortUrl = () => SHARE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  // One frame of the card. f: { sold: 0..1 plaque stamp, roast: 0..1, bid: {price, bidder} | null }
+  function drawCard(x, a, fmt, f) {
+    const L = LAYOUT[fmt], { W, H } = L;
     x.fillStyle = "#050505"; x.fillRect(0, 0, W, H);
-    const rh = H, rw = rh * 1.6; x.drawImage(room, (W - rw) / 2, 0, rw, rh);
+    // the room sits at the same scale on both formats, so the wall painting stays hidden behind the lot
+    const rh = 1350, rw = rh * 1.6, ry = L.ly - 180; x.drawImage(a.room, (W - rw) / 2, ry, rw, rh);
+    if (ry > 0) { const t = x.createLinearGradient(0, 0, 0, ry + 260); t.addColorStop(0, "#050505"); t.addColorStop(ry / (ry + 260), "rgba(5,5,5,.9)"); t.addColorStop(1, "rgba(5,5,5,0)"); x.fillStyle = t; x.fillRect(0, 0, W, ry + 260); }
     const g = x.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, "rgba(0,0,0,.55)"); g.addColorStop(.45, "rgba(0,0,0,.6)"); g.addColorStop(.75, "rgba(0,0,0,.85)"); g.addColorStop(1, "rgba(0,0,0,.96)");
     x.fillStyle = g; x.fillRect(0, 0, W, H);
-    const s = 2.0, lx = 57, ly = 180;
-    x.save(); x.translate(lx, ly); x.scale(s, s);
+    // hush behind the lot, like the SOLD screen, so the wall painting doesn't peek out
+    const hx = L.lx + 470, hy = L.ly + 330, hush = x.createRadialGradient(hx, hy, 0, hx, hy, 620);
+    hush.addColorStop(0, "rgba(0,0,0,1)"); hush.addColorStop(.55, "rgba(0,0,0,.96)"); hush.addColorStop(1, "rgba(0,0,0,0)");
+    x.fillStyle = hush; x.fillRect(0, 0, W, H);
+    const s = 2.0, photo = a.photo;
+    x.save(); x.translate(L.lx, L.ly); x.scale(s, s);
     x.save(); x.translate(240.8, 241); x.rotate(-9.8 * Math.PI / 180);
     const pw = 326, ph = 219, r = Math.max(pw / photo.naturalWidth, ph / photo.naturalHeight);
     x.beginPath(); x.rect(-pw / 2, -ph / 2, pw, ph); x.clip();
     x.drawImage(photo, -photo.naturalWidth * r / 2, -photo.naturalHeight * r / 2, photo.naturalWidth * r, photo.naturalHeight * r);
+    if (f.sold >= 1) {
+      // group price tags, copied from the SOLD screen
+      x.font = "700 12px 'Inter Tight', Arial, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+      document.querySelectorAll("#tags .tag").forEach(t => {
+        const tx = parseFloat(t.style.left) / 100 * pw - pw / 2, ty = parseFloat(t.style.top) / 100 * ph - ph / 2;
+        const tw = x.measureText(t.textContent).width + 12;
+        x.fillStyle = t.classList.contains("top") ? "#f3dca4" : "#f63434"; x.fillRect(tx - tw / 2, ty - 20, tw, 20);
+        x.fillStyle = t.classList.contains("top") ? "#2a1a00" : "#fff"; x.fillText(t.textContent, tx, ty - 10);
+      });
+    }
     x.restore();
-    x.drawImage(frame, 0, 0, 470.35, 430.6);
-    x.save(); x.translate(192.7, 212.2); x.drawImage(plaque, 0, 0, 258.45, 157.7);
-    x.translate(134, 122); x.rotate(-4.6 * Math.PI / 180);
-    x.fillStyle = "#f3dca4"; x.font = "500 32px Cinzel, Georgia, serif"; x.textAlign = "center"; x.textBaseline = "middle";
-    x.fillText(money(lastSale.price), 0, 0);
-    x.restore(); x.restore();
+    x.drawImage(a.frame, 0, 0, 470.35, 430.6);
+    if (f.sold > 0) {
+      const k = 1 + (1 - f.sold) * 0.8;
+      x.save(); x.globalAlpha = Math.min(1, f.sold * 1.5);
+      x.translate(192.7 + 129.2, 212.2 + 78.8); x.scale(k, k); x.rotate((1 - f.sold) * -6 * Math.PI / 180); x.translate(-129.2, -78.8);
+      x.drawImage(a.plaque, 0, 0, 258.45, 157.7);
+      x.translate(134, 122); x.rotate(-4.6 * Math.PI / 180);
+      x.fillStyle = "#f3dca4"; x.font = "500 32px Cinzel, Georgia, serif"; x.textAlign = "center"; x.textBaseline = "middle";
+      x.fillText(money(lastSale.price), 0, 0);
+      x.restore();
+    }
+    x.restore();
     x.textAlign = "center"; x.textBaseline = "alphabetic";
-    x.fillStyle = "#ff3b3b"; x.font = "400 42px 'Inter Tight', Arial, sans-serif";
-    const lines = wrap(x, $("roast").textContent, 900);
-    lines.forEach((l, i) => x.fillText(l, W / 2, 1024 + i * 52));
+    if (f.bid && f.sold === 0) {
+      x.fillStyle = "#f63434"; x.font = "400 120px 'Inter Tight', Arial, sans-serif";
+      x.fillText(money(f.bid.price), W / 2, L.roastY + 60);
+      x.fillStyle = "#fff"; x.font = "400 36px 'Inter Tight', Arial, sans-serif";
+      wrap(x, "from " + f.bid.bidder, 900).slice(0, 2).forEach((l, i) => x.fillText(l, W / 2, L.roastY + 130 + i * 44));
+    }
+    if (f.roast > 0) {
+      x.globalAlpha = f.roast;
+      x.fillStyle = "#ff3b3b"; x.font = "400 42px 'Inter Tight', Arial, sans-serif";
+      const lines = wrap(x, $("roast").textContent, 900);
+      lines.forEach((l, i) => x.fillText(l, W / 2, L.roastY + i * 52));
+      let y = L.roastY + lines.length * 52 + 18;
+      x.font = "500 30px 'Inter Tight', Arial, sans-serif"; x.fillStyle = "#f3dca4";
+      if (lastSale.rare) { x.fillText("RARE SALE · about 1 in 12 photos", W / 2, y); y += 44; }
+      if (lastSale.group) { x.fillText(`GROUP LOT · ${lastSale.group} faces sold separately`, W / 2, y); }
+      x.globalAlpha = 1;
+    }
+    if (fmt === "story") {
+      x.textAlign = "center"; x.fillStyle = "#f3dca4"; x.font = "500 34px Cinzel, Georgia, serif";
+      x.fillText("LOT 4821  ·  ONE PHOTO", W / 2, 300);
+      if (f.roast > 0) { x.globalAlpha = f.roast; x.fillStyle = "#fff"; x.font = "400 64px 'Inter Tight', Arial, sans-serif"; x.fillText(`Can you beat ${money(lastSale.price)}?`, W / 2, 1600); x.globalAlpha = 1; }
+    }
     x.textAlign = "left"; x.fillStyle = "#fff"; x.font = "300 50px 'Inter Tight', Arial, sans-serif";
-    x.fillText("What’s your photo", 70, 1250);
-    const w1 = x.measureText("What’s your photo ").width; x.font = "600 50px 'Inter Tight', Arial, sans-serif"; x.fillText("worth?", 70 + w1, 1250);
+    x.fillText("What’s your photo", 70, L.footY);
+    const w1 = x.measureText("What’s your photo ").width; x.font = "600 50px 'Inter Tight', Arial, sans-serif"; x.fillText("worth?", 70 + w1, L.footY);
     x.fillStyle = "#9a9a9a"; x.font = "300 28px 'Inter Tight', Arial, sans-serif";
-    x.fillText(SHARE_URL.replace(/^https?:\/\//, "").replace(/\/$/, ""), 70, 1296);
-    x.textAlign = "right"; x.fillText("by Ente", W - 70, 1296);
+    x.fillText(shortUrl(), 70, L.footY + 46);
+    x.textAlign = "right"; x.fillText("by Ente", W - 70, L.footY + 46);
+  }
+  async function makeCard(fmt) {
+    const a = await loadArt(), L = LAYOUT[fmt];
+    const c = document.createElement("canvas"); c.width = L.W; c.height = L.H;
+    drawCard(c.getContext("2d"), a, fmt, { sold: 1, roast: 1, bid: null });
     return new Promise(res => c.toBlob(res, "image/png"));
   }
-  const fullText = () => lastShare + " " + SHARE_URL;
-  $("shareBtn").addEventListener("click", async () => {
-    const btn = $("shareBtn"); btn.disabled = true;
-    try { cardBlob = await makeCard(); } catch (e) { cardBlob = null; }
-    btn.disabled = false;
-    const file = cardBlob && new File([cardBlob], "my-photo-sold.png", { type: "image/png" });
-    if (file && navigator.canShare && navigator.canShare({ files: [file] }) && matchMedia("(pointer: coarse)").matches) {
-      try { await navigator.share({ files: [file], text: fullText() }); return; } catch (e) { if (e.name === "AbortError") return; }
+  // A 6 second vertical replay: the bids tick up, the SOLD plaque stamps down, the roast lands
+  function videoType() {
+    if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) return null;
+    return ["video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9", "video/webm"].find(t => MediaRecorder.isTypeSupported(t)) || null;
+  }
+  async function makeVideo() {
+    const type = videoType(); if (!type) return null;
+    const a = await loadArt(), L = LAYOUT.story;
+    const c = document.createElement("canvas"); c.width = L.W; c.height = L.H;
+    const x = c.getContext("2d");
+    const bids = (lastSale.history || []).slice(-6);
+    const T = 6000, tBids = 3600, tSold = 3900;
+    const frameAt = (ms) => {
+      const sold = ms < tSold ? 0 : Math.min(1, (ms - tSold) / 320);
+      const roast = ms < tSold + 450 ? 0 : Math.min(1, (ms - tSold - 450) / 400);
+      const i = Math.min(bids.length - 1, Math.floor(ms / (tBids / Math.max(1, bids.length))));
+      return { sold, roast, bid: bids.length ? bids[Math.max(0, i)] : { price: lastSale.price, bidder: lastSale.winner.bidder } };
+    };
+    drawCard(x, a, "story", frameAt(0));
+    const stream = c.captureStream(30), rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 6e6 });
+    const chunks = []; rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    const done = new Promise(res => rec.onstop = res);
+    rec.start(250);
+    const t0 = performance.now();
+    await new Promise(res => {
+      const tick = () => { const ms = performance.now() - t0; drawCard(x, a, "story", frameAt(Math.min(ms, T))); if (ms < T) requestAnimationFrame(tick); else res(); };
+      requestAnimationFrame(tick);
+    });
+    rec.stop(); await done;
+    return new Blob(chunks, { type: type.split(";")[0] });
+  }
+
+  const shareLink = () => {
+    const by = lastSale.winner.key === "local" ? "a local data broker" : lastSale.winner.bidder;
+    // s/<cents>.html is a static page with a preview image for that price, then it forwards to the game
+    const c = Math.round(lastSale.price * 100);
+    const k = c <= 150 ? Math.max(5, c) : c <= 500 ? Math.floor(c / 5) * 5 : c <= 1200 ? Math.floor(c / 25) * 25 : Math.min(2500, Math.floor(c / 100) * 100);
+    return SHARE_URL + `s/${k}.html?p=${lastSale.price.toFixed(2)}&by=${encodeURIComponent(by)}`;
+  };
+  const fullText = () => lastShare + " " + shareLink();
+  const media = { post: null, story: null, video: null };
+  let fmt = "post", mediaUrl = "";
+  async function showFormat(next) {
+    fmt = next;
+    document.querySelectorAll("#shareTabs .tab").forEach(b => b.setAttribute("aria-selected", b.dataset.fmt === fmt));
+    const img = $("cardPreview"), vid = $("vidPreview"), note = $("recNote"), dl = $("dlBtn");
+    dl.disabled = true; note.hidden = true;
+    if (!media[fmt]) {
+      if (fmt === "video") { img.hidden = true; vid.hidden = true; note.hidden = false; note.textContent = "Recording your replay…"; }
+      try { media[fmt] = fmt === "video" ? await makeVideo() : await makeCard(fmt); } catch (e) { media[fmt] = null; }
+      if (fmt !== next) return;
     }
-    const u = encodeURIComponent(SHARE_URL), tx = encodeURIComponent(lastShare);
+    const blob = media[fmt];
+    if (mediaUrl) URL.revokeObjectURL(mediaUrl);
+    mediaUrl = blob ? URL.createObjectURL(blob) : "";
+    note.hidden = !!blob; if (!blob) note.textContent = fmt === "video" ? "This browser can’t record video. Try the Story image." : "Couldn’t draw the card.";
+    img.hidden = fmt === "video" || !blob; vid.hidden = fmt !== "video" || !blob;
+    if (fmt === "video") { if (blob) { vid.src = mediaUrl; vid.play().catch(() => {}); } } else if (blob) img.src = mediaUrl;
+    img.classList.toggle("tall", fmt === "story");
+    dl.disabled = !blob;
+    dl.textContent = touch ? "Share" : fmt === "video" ? "Download video" : "Download image";
+  }
+  const touch = matchMedia("(pointer: coarse)").matches;
+  $("shareBtn").addEventListener("click", () => {
+    media.post = media.story = media.video = null;
+    const u = encodeURIComponent(shareLink()), tx = encodeURIComponent(lastShare);
     $("xLink").href = `https://x.com/intent/post?text=${tx}&url=${u}`;
     $("fbLink").href = `https://www.facebook.com/sharer/sharer.php?u=${u}`;
     $("waLink").href = `https://wa.me/?text=${encodeURIComponent(fullText())}`;
     $("shareText").value = fullText();
-    const prev = $("cardPreview");
-    if (cardBlob) { prev.hidden = false; prev.src = URL.createObjectURL(cardBlob); } else prev.hidden = true;
-    $("dlBtn").hidden = !cardBlob;
     $("shareSheet").hidden = false; $("shareClose").focus();
+    showFormat("post");
   });
-  $("dlBtn").addEventListener("click", () => {
-    const a = document.createElement("a"); a.href = $("cardPreview").src; a.download = "my-photo-sold.png";
+  document.querySelectorAll("#shareTabs .tab").forEach(b => b.addEventListener("click", () => showFormat(b.dataset.fmt)));
+  $("dlBtn").addEventListener("click", async () => {
+    const blob = media[fmt]; if (!blob) return;
+    const ext = blob.type.includes("mp4") ? "mp4" : blob.type.includes("webm") ? "webm" : "png";
+    const name = `my-photo-sold${fmt === "story" ? "-story" : ""}.${ext}`;
+    const file = new File([blob], name, { type: blob.type });
+    if (touch && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], text: fullText() }); return; } catch (e) { if (e.name === "AbortError") return; }
+    }
+    const a = document.createElement("a"); a.href = mediaUrl; a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
   });
   $("copyBtn").addEventListener("click", async () => {
@@ -686,9 +987,10 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     catch (e) { const t = $("shareText"); t.focus(); t.select(); toast("Copy the selected text."); }
   });
   const shareSheet = $("shareSheet");
-  $("shareClose").addEventListener("click", () => { shareSheet.hidden = true; });
-  shareSheet.addEventListener("click", (e) => { if (e.target === shareSheet) shareSheet.hidden = true; });
-  addEventListener("keydown", (e) => { if (e.key === "Escape") shareSheet.hidden = true; });
+  const closeShare = () => { shareSheet.hidden = true; $("vidPreview").pause(); };
+  $("shareClose").addEventListener("click", closeShare);
+  shareSheet.addEventListener("click", (e) => { if (e.target === shareSheet) closeShare(); });
+  addEventListener("keydown", (e) => { if (e.key === "Escape") closeShare(); });
 
   const method = $("method");
   document.querySelectorAll("[data-open-method]").forEach(b => b.addEventListener("click", () => { method.hidden = false; $("methodClose").focus(); }));
