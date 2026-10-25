@@ -183,10 +183,10 @@ body.narrow .ui { left: 0; top: 0; width: 100%; height: 100%; }
 body.narrow { --nav: calc(46px + env(safe-area-inset-top, 0px)); }
 body.narrow .stage { top: var(--nav); }
 body.narrow .landing .links { position: fixed; z-index: 6; top: 0; left: 0; right: 0; height: var(--nav); margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: env(safe-area-inset-top, 0px) max(20px, env(safe-area-inset-right, 0px)) 0 max(20px, env(safe-area-inset-left, 0px)); font-size: 15px; line-height: 1; flex-wrap: nowrap; }
-body.narrow .landing { position: absolute; left: 0; right: 0; top: calc(var(--nav) + var(--fb) + 10px); bottom: 0; display: flex; flex-direction: column; gap: 14px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); padding-block: 0 max(73px, calc(env(safe-area-inset-bottom, 0px) + 40px)); }
+body.narrow .landing { position: absolute; left: 0; right: 0; top: calc(var(--nav) + var(--fb) + 10px); bottom: 0; display: flex; flex-direction: column; gap: 14px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); padding-block: 0 max(14px, calc(env(safe-area-inset-bottom, 0px) + 8px)); }
 /* copy sits in the space between the frame and the links, a little above centre (as in Figma) */
-body.narrow .landing::before { content: ""; flex: 33 1 0; min-height: 6px; }
-body.narrow .landing .spacer { position: relative; left: auto; top: auto; width: auto; height: auto; display: block; flex: 67 1 0; }
+body.narrow .landing::before { content: ""; flex: 29 1 0; min-height: 6px; }
+body.narrow .landing .spacer { position: relative; left: auto; top: auto; width: auto; height: auto; display: block; flex: 71 1 0; }
 /* Bidder chatter on the first screen: desktop sits over the crowd right of the headline, phones between the copy and the links */
 .landing .spacer { position: absolute; left: calc(860 * var(--u)); top: calc(270 * var(--u)); width: calc(540 * var(--u)); height: calc(220 * var(--u)); pointer-events: none; }
 .chat { position: absolute; width: max-content; max-width: calc(230 * var(--u)); padding: calc(8 * var(--u)) calc(12 * var(--u)); background: var(--cream); color: #141414; font-size: max(12px, calc(15 * var(--u))); line-height: 1.22; letter-spacing: -.02em; font-weight: 500; border-radius: calc(11 * var(--u)); box-shadow: 0 6px 18px rgba(0,0,0,.5); transform: translate(calc(-1 * var(--tail)), -100%) scale(.6); transform-origin: var(--tail) 100%; opacity: 0; transition: opacity .2s, transform .3s cubic-bezier(.2,1.4,.4,1); text-wrap: balance; }
@@ -200,7 +200,7 @@ body.narrow h1, body.narrow .sub, body.narrow .links { position: static; white-s
 body.narrow h1 { font-size: clamp(44px, 14.4vw, 68px); line-height: .86; }
 body.narrow .sub { font-size: clamp(17px, 5.1vw, 22px); line-height: 1.1; }
 body.narrow .links { font-size: clamp(16px, 4.6vw, 20px); gap: 10px 32px; flex-wrap: wrap; }
-@media (max-height: 700px) { body.narrow h1 { font-size: 46px; } body.narrow .sub { font-size: 16px; } body.narrow .landing { gap: 10px; padding-bottom: 28px; } }
+@media (max-height: 700px) { body.narrow h1 { font-size: 46px; } body.narrow .sub { font-size: 16px; } body.narrow .landing { gap: 10px; } }
 .links > * { white-space: nowrap; }
 body.narrow .bidding-copy { top: 0; bottom: 0; padding-inline: 10px; }
 body.narrow .bidding-title { position: absolute; left: 10px; right: 10px; top: calc(var(--nav) + 135 * var(--k)); }
@@ -467,7 +467,8 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     b.className = "chat";
     b.innerHTML = `<span class="who">${esc(who)}</span>${esc(text)}`;
     const [x, y, tail] = spot;
-    Object.assign(b.style, { left: x + "%", top: phone() ? `calc(${y}% - 12px)` : y + "%" });
+    // phones: just under the copy, or at the bottom when space is tight
+    Object.assign(b.style, { left: x + "%", top: phone() ? `min(calc(${y}% - 12px), 100px)` : y + "%" });
     b.style.setProperty("--tail", tail + "%");
     box.appendChild(b);
     requestAnimationFrame(() => requestAnimationFrame(() => b.classList.add("show")));
