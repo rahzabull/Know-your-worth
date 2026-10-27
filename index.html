@@ -124,7 +124,7 @@ body.narrow .bidding-title .dots { display: inline; }
 .bidding-title { margin: 0; color: var(--red); font-weight: 400; font-size: calc(150 * var(--u)); line-height: 1; letter-spacing: -.06em; white-space: nowrap; }
 .caption { display: block; margin-top: calc(18 * var(--u)); font-size: calc(21 * var(--u)); color: #fff; letter-spacing: -.02em; min-height: 1.3em; font-variant-numeric: tabular-nums; }
 /* Going once, going twice, sold: big, just under the painting, each step popping in */
-.countdown { position: absolute; z-index: 4; left: 0; right: 0; top: calc(336 * var(--k)); margin: 0; text-align: center; color: #fff; font-size: calc(52 * var(--k)); font-weight: 600; letter-spacing: -.04em; line-height: 1.1; text-shadow: 0 2px 6px rgba(0,0,0,.6), 0 0 32px rgba(0,0,0,.85); pointer-events: none; opacity: 0; }
+.countdown { position: absolute; z-index: 4; left: 50%; width: max-content; translate: -50% 0; top: calc(336 * var(--k)); margin: 0; text-align: center; color: #fff; font-size: calc(52 * var(--k)); font-weight: 600; letter-spacing: -.04em; line-height: 1.1; text-shadow: 0 2px 6px rgba(0,0,0,.6), 0 0 32px rgba(0,0,0,.85); pointer-events: none; opacity: 0; }
 .countdown.tick { opacity: 1; animation: tick .35s cubic-bezier(.2,1.4,.4,1); }
 @keyframes tick { from { transform: scale(.7); opacity: .3; } }
 @media (prefers-reduced-motion: reduce) { .countdown.tick { animation: none; } }
@@ -796,7 +796,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     return (spot ? [spot] : []).concat(mix(r), mix(ROASTS));
   }
   const bubbles = new Map();
-  function say(armEl, html, rival) {
+  function say(armEl, html, rival, avoid) {
     if (!armEl || armEl.hidden || !armEl.pos) return;
     let b = bubbles.get(armEl);
     if (!b) { b = document.createElement("div"); b.className = "bubble"; $("arms").appendChild(b); bubbles.set(armEl, b); }
@@ -809,6 +809,11 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     const bx = Math.min(Math.max(x, lo), hi);
     b.style.left = `calc(${bx} * var(--k))`; b.style.top = `calc(${y} * var(--k))`;
     b.style.setProperty("--tail", `${Math.min(88, Math.max(12, 50 + (x - bx) / w * 100))}%`);
+    // stay quiet rather than cover something that matters more (the countdown)
+    if (avoid) {
+      const l = b.offsetLeft - b.offsetWidth / 2, t = b.offsetTop - b.offsetHeight, al = avoid.offsetLeft - avoid.offsetWidth / 2;
+      if (l < al + avoid.offsetWidth && l + b.offsetWidth > al && t < avoid.offsetTop + avoid.offsetHeight && b.offsetTop > avoid.offsetTop) return;
+    }
     clearTimeout(b.timer);
     requestAnimationFrame(() => b.classList.add("show"));
     b.timer = setTimeout(() => b.classList.remove("show"), 2300);
@@ -823,7 +828,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     const wait = (ms) => new Promise(r => setTimeout(r, ms));
     const pick = (list) => list[Math.floor(rand() * list.length)];
     // nobody repeats a line in the same auction while they have fresh ones
-    const used = new Set();
+    const used = new Set(), later = []; // later: lines still waiting to be said
     const fresh = (list) => { const left = list.filter(x => !used.has(x)), l = pick(left.length ? left : list); used.add(l); return l; };
     const talkFor = (b) => fresh((TALK[b.key] || TALK.base).filter(l => b.thing || !l.includes("{t}"))).replace("{t}", b.thing);
     // bidders call each other by name, except the long rare ones
@@ -849,10 +854,10 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       const n = history.length, beat = n > 1 && history[n - 2].seat !== seats[i] ? history[n - 2] : null;
       let text = n <= 2 && roasts.length ? roasts.shift() : talkFor(bidders[i]);
       if (n > 2 && beat && named(beat.bidder) && rand() < 0.3) text = fill(fresh(OUTBID), beat.bidder);
-      setTimeout(() => say(arm(i), text), 380);
+      later.push(setTimeout(() => say(arm(i), text), 380));
       if (beat && rand() < 0.55) {
         const back = named(bidders[i].bidder) ? RIVAL : RIVAL.filter(l => !l.includes("{who}"));
-        setTimeout(() => say(armEls[beat.seat], fill(fresh(back), bidders[i].bidder), true), 1050);
+        later.push(setTimeout(() => say(armEls[beat.seat], fill(fresh(back), bidders[i].bidder), true), 1050));
       }
     };
     // paddles keep going for at least 4 seconds from the first bid
@@ -892,8 +897,8 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     const cd = $("countdown");
     const count = (text) => { cd.textContent = text; cd.classList.remove("tick"); void cd.offsetWidth; cd.classList.add("tick"); };
     caption.textContent = `${money(price)} to ${bidders[0].bidder}.`;
-    count("Going once…"); await wait(800);
-    count("Going twice…"); say(arm(0), pick(MINE)); await wait(800);
+    later.forEach(clearTimeout); hush(); count("Going once…"); await wait(800);
+    count("Going twice…"); say(arm(0), pick(MINE), false, cd); await wait(800);
     count("Sold!"); await wait(500);
     hush();
     return { price, winner: bidders[0], history };
