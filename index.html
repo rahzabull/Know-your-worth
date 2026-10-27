@@ -145,7 +145,7 @@ body.is-sold .lot { transform: none; opacity: 1; }
 .plaque { --p: calc(var(--s) * .7525); position: absolute; left: calc(217.5 * var(--s)); top: calc(335 * var(--s)); width: calc(258.45 * var(--p)); height: calc(157.7 * var(--p)); transform: scale(1.7) rotate(-6deg); opacity: 0; transition: transform .45s .6s cubic-bezier(.2,.9,.3,1.3), opacity .2s .6s; }
 body.is-sold .plaque { transform: none; opacity: 1; }
 .plaque img { display: block; width: 100%; height: 100%; }
-.plaque .price { position: absolute; left: calc(84 * var(--p)); top: calc(102 * var(--p)); width: calc(100 * var(--p)); height: calc(40 * var(--p)); display: grid; place-items: center; font-family: var(--serif); font-weight: 500; font-size: calc(36 * var(--p)); color: var(--gold-ink); transform: rotate(-4.6deg); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.plaque .price { position: absolute; left: calc(80 * var(--p)); top: calc(96 * var(--p)); width: calc(100 * var(--p)); height: calc(40 * var(--p)); display: grid; place-items: center; font-family: var(--serif); font-weight: 500; font-size: calc(36 * var(--p)); color: var(--gold-ink); transform: rotate(-4.6deg); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .roast { position: absolute; left: calc(320 * var(--u)); width: calc(800 * var(--u)); top: calc(598 * var(--u)); margin: 0; text-align: center; color: var(--red); font-size: calc(22 * var(--u)); line-height: 1.15; text-wrap: balance; letter-spacing: -.045em; }
 .actions { position: absolute; left: calc(522 * var(--u)); top: calc(647 * var(--u)); display: flex; gap: calc(82.6 * var(--u)); transition: top .3s; }
 .leak { position: absolute; left: calc(270 * var(--u)); width: calc(900 * var(--u)); top: calc(632 * var(--u)); margin: 0; text-align: center; color: #d8d8d8; font-size: calc(16 * var(--u)); line-height: 1.35; letter-spacing: -.02em; text-wrap: balance; }
@@ -1100,7 +1100,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       x.save(); x.globalAlpha = Math.min(1, f.sold * 1.5);
       x.translate(217.5 + 129.2 * .7525, 335 + 78.8 * .7525); x.scale(k, k); x.rotate((1 - f.sold) * -6 * Math.PI / 180); x.translate(-129.2, -78.8);
       x.drawImage(a.plaque, 0, 0, 258.45, 157.7);
-      x.translate(134, 122); x.rotate(-4.6 * Math.PI / 180);
+      x.translate(130, 120); x.rotate(-4.6 * Math.PI / 180);
       x.fillStyle = "#f3dca4"; x.font = "500 36px Cinzel, Georgia, serif"; x.textAlign = "center"; x.textBaseline = "middle";
       x.fillText(money(lastSale.price), 0, 0);
       x.restore();
