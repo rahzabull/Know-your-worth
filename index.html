@@ -442,23 +442,28 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
   addEventListener("resize", fit); fit();
   /* ---------- Bidder chatter on the first screen, in a new random order on every visit ---------- */
   const CHATTER = [
-    [["A", "Anyone else waiting for a photo?"], ["B", "Paddle’s been up since breakfast."]],
-    [["A", "Ten cents says it’s a sunset."], ["B", "Twenty says it’s a cat in a sunset."], ["Paws & Co.", "Thirty if it’s the cat."]],
-    [["A", "What are we bidding on today?"], ["B", "Whatever they upload. We’re not picky."], ["Paws & Co.", "Speak for yourself. I only buy dogs."]],
-    [["A", "Last one was a wedding. I paid $8."], ["B", "Worth it. They’re having a baby next year."]],
-    [["A", "Do they know we can see where photos are taken?"], ["B", "Shh. Don’t ruin it."]],
+    [["A", "Is it uploading? I can feel it uploading."], ["B", "Easy, tiger."]],
+    [["A", "Ten cents says it’s a sunset."], ["B", "Twenty says a cat in a sunset."], ["Paws & Co.", "Thirty. I just want the cat."]],
+    [["A", "Should we tell them Ente encrypts photos?"], ["B", "And lose our jobs? Absolutely not."]],
+    [["A", "Remember when someone uploaded a passport?"], ["B", "Best Tuesday of my life."]],
+    [["A", "Last one was a wedding. I paid $8."], ["B", "Steal. Baby photos in a year."], ["C", "Divorce lawyers in seven."]],
+    [["A", "Do they know the file says where it was taken?"], ["B", "Shh. Let them think it’s just pixels."]],
     [["A", "I already know their shoe size."], ["B", "Creepy."], ["A", "Profitable."]],
-    [["A", "My algorithm says the next one’s a beach."], ["B", "Your algorithm says that every time."]],
+    [["A", "Gary, nothing’s uploaded yet."], ["B", "I like to be ready."], ["A", "Put the paddle down, Gary."]],
+    [["A", "What if they read the privacy policy?"], ["B", "Relax. Nobody gets to page 41."]],
+    [["A", "Hope it’s brunch."], ["Crave Delivery", "Avocado toast? I’ll go to a dollar."], ["B", "You need help."]],
+    [["DriveNow Motors", "Bet it’s a car."], ["B", "You say that every time."], ["DriveNow Motors", "One day I’ll be right."]],
+    [["A", "If the face is boring, I bid on the background."], ["B", "Same. A fridge tells you everything."]],
+    [["A", "Imagine their camera roll."], ["B", "I do. Every night."]],
+    [["A", "What if they use Ente?"], ["B", "Then we all go home hungry."]],
+    [["A", "Is it weird we bid on strangers?"], ["B", "Not in this economy."]],
+    [["A", "Please be a selfie. Please be a selfie."], ["B", "Stop. You’ll scare it off."]],
+    [["Paws & Co.", "Psst. Upload a pet. I’ll make it worth it."], ["B", "Are you bribing the product?"]],
     [["A", "Who’s going first?"], ["B", "Not me. Still paying off the last selfie."]],
-    [["Paws & Co.", "Psst. Upload a pet. We go wild for pets."], ["B", "Calm down."]],
     [["A", "Drag it in, we don’t bite."], ["B", "We just resell."]],
-    [["A", "I hope it’s brunch."], ["Crave Delivery", "Avocado toast? I’ll go to a dollar."]],
-    [["A", "Is the uploader nervous?"], ["B", "They should be."]],
-    [["A", "If the face is boring, I’ll bid on the background."], ["B", "Same. Love a good logo."]],
-    [["A", "Should we tell them Ente encrypts photos?"], ["B", "Absolutely not."]],
-    [["A", "New phone, new photos, new ads."], ["B", "The circle of life."]],
-    [["DriveNow Motors", "Bet it’s a car."], ["B", "You say that about every photo."]],
-    [["A", "Gary, nothing’s uploaded yet."], ["B", "I like to be ready."]],
+    [["SafeHome Insurance", "Hoping for a photo of their stairs."], ["B", "Why?"], ["SafeHome Insurance", "No reason."]],
+    [["A", "My kid asked what I do for work."], ["B", "What did you say?"], ["A", "Photography."]],
+    [["A", "They think deleting it later helps."], ["B", "Adorable."]],
   ];
   const CHAT_NAMES = ["Lifestyle Corp.", "DataMart", "ClickFlow Media", "BrightAds Network", "AudienceOne", "Wanderlust Travel", "SafeHome Insurance", "GadgetHub"];
   // desktop: three spots over the crowd; phones: one bubble at a time, alternating sides
@@ -579,16 +584,17 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       if (when instanceof Date && !isNaN(when)) {
         const h = when.getHours(), late = h >= 22 || h < 5;
         const day = when.toLocaleDateString("en-US", { weekday: "long" });
-        const time = when.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }).replace(" ", "").toLowerCase();
+        const time = when.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }).replace(/\s/, "").toLowerCase();
         out.items.push(`<b>${day}, ${time}</b>`);
         out.bump += late ? 0.17 : 0.06;
-        out.late = late;
+        Object.assign(out, { late, day, time, work: !late && h >= 9 && h < 17 && when.getDay() % 6 !== 0 });
       }
       if (m.Model) {
         const make = (m.Make || "").trim(), model = String(m.Model).trim();
         const cam = model.toLowerCase().startsWith(make.toLowerCase().split(" ")[0]) || /iphone|pixel|galaxy/i.test(model) ? model : (make + " " + model).trim();
-        out.items.push(`on an <b>${esc(cam)}</b>`);
-        out.bump += /iphone 1[3-9] pro|iphone 1[6-9]|galaxy s2|pixel [7-9]|pixel 1\d/i.test(cam) ? 0.21 : 0.05;
+        out.items.push(`on ${/^[aeiou]/i.test(cam) ? "an" : "a"} <b>${esc(cam)}</b>`);
+        out.cam = cam; out.fancy = /iphone 1[3-9] pro|iphone 1[6-9]|galaxy s2|pixel [7-9]|pixel 1\d/i.test(cam);
+        out.bump += out.fancy ? 0.21 : 0.05;
       }
       if (!out.items.length) return null;
       out.bump = Math.round(out.bump * 100) / 100;
@@ -685,9 +691,10 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     const found = [];
     if (preds) {
       for (const c of CATS) {
-        let s = 0;
-        for (const p of preds) if ((c.idx && c.idx.includes(p.i)) || (c.words && c.words.includes(p.name))) s += p.p;
-        if (s >= (c.min || 0.04)) found.push({ ...c, score: s });
+        let s = 0, top = null;
+        for (const p of preds) if ((c.idx && c.idx.includes(p.i)) || (c.words && c.words.includes(p.name))) { s += p.p; if (!top || p.p > top.p) top = p; }
+        // the bidders only name what the model is fairly sure of
+        if (s >= (c.min || 0.04)) found.push({ ...c, score: s, thing: top && top.p >= 0.12 ? NICE[top.name] || top.name : null });
       }
     }
     if (stats.lum < 62 && !found.some(f => f.key === "drinks")) found.push({ ...NIGHT, score: 0.2 });
@@ -717,42 +724,68 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
   const cap = (s) => s[0].toUpperCase() + s.slice(1);
   const sleep = (ms) => new Promise(r => setTimeout(r, reduced ? Math.min(ms, 120) : ms));
 
-  /* ---------- Bidder talk: what each bidder says when it raises its paddle ---------- */
+  /* ---------- Bidder talk: what each bidder says when it raises its paddle ----------
+     {t} is what the model saw in the photo, {who} is another bidder. Lines with {t} only show when there is one. */
   const TALK = {
-    pets: ["That pet has more reach than you.", "We’d like to speak to the pet’s manager."],
-    car: ["Nice car. Shame about the loan.", "Someone’s due an upgrade."],
-    travel: ["This person needs another holiday.", "Window seat energy. Bidding."],
-    food: ["Anyone who photographs lunch buys lunch.", "We’ll take the plate, keep the person."],
-    drinks: ["Friday night written all over it.", "Last orders? Never heard of them."],
-    fitness: ["Gym photo? We smell a January sign-up.", "Those protein ads won’t sell themselves."],
-    home: ["Nice place. Is it insured? Asking for us.", "We noticed the stairs."],
-    tech: ["That phone is two years old. Perfect.", "Upgrade season starts now."],
-    fashion: ["That outfit needs a sale email.", "We already know their size."],
-    wedding: ["A wedding! Everyone stay calm.", "Florists, back off. Mine."],
-    baby: ["A baby! That’s 18 years of ads.", "Nappies now, college funds later."],
-    moving: ["Boxes mean a new sofa.", "New address, new everything."],
-    party: ["Who’s planning the next one? Us.", "Balloons? We’re in."],
-    base: ["Honestly? Pleasant. Mildly marketable.", "Generic, but generic sells."],
-    night: ["Taken after dark. We have offers.", "Up late? So are our ads."],
-    outdoor: ["Fresh air sells hiking boots.", "Nature. Our favourite backdrop."],
-    x1: ["We’ll take the vibe, keep the face.", "Our algorithm blinked twice."],
-    x2: ["Mostly here for the background.", "There’s a logo back there. Mine."],
-    x3: ["The lighting alone is worth a cent.", "Eh. Bidding anyway."],
-    x4: ["Bidding on principle.", "We bid on everything. It’s our thing."],
-    r1: ["We’ve seen this face before. Hi."], r2: ["Great face for training data."], r3: ["All five of us. Together."],
-    r4: ["Up at that hour? We need to talk."], r5: ["Shared! Already shared!"],
-    local: ["We’re practically neighbours.", "We can see your street from here."],
+    pets: ["The {t} has better reach than you.", "We’d like to speak to the {t}’s manager.", "Who’s a good little data point? You are.", "Cute. Its treat budget pays my rent."],
+    car: ["Love the {t}. How’s the loan going?", "Nice ride. Shame about the interest rate.", "We smell a lease ending in March.", "One scratch and they’re ours."],
+    travel: ["The {t}? Oh, they’re booking again.", "Fly now. Pay for the rest of your life.", "They’ll book anything after a photo like this.", "Lovely view. Our fees are lovelier."],
+    food: ["We’ll take the {t}. Keep the person.", "Anyone who photographs lunch buys lunch.", "Delivery fee, service fee, vibes fee.", "Craving logged. Ads at 11pm sharp."],
+    drinks: ["The {t} says ‘one more’. We agree.", "Friday night written all over it.", "Hangover ads go live at 9am.", "Cheers! Tomorrow’s headache is on us."],
+    fitness: ["The {t} says ‘new me’. We bill the old one.", "Gym photo? We smell a January sign-up.", "Cancel? Sure. In person. In triplicate.", "Protein powder ads, deploy."],
+    home: ["Lovely {t}. Would be a shame if…", "Nice place. Is it insured? Asking for us.", "We noticed the stairs. We always do.", "Cozy. Premiums just went up."],
+    tech: ["The {t} is two years old. Perfect.", "Battery at 12%? Upgrade time.", "Planned obsolescence says hi.", "Their charger is fraying. We can tell."],
+    fashion: ["Love the {t}. Here are 40 more like it.", "We already know their size. Don’t ask.", "That outfit needs a sale email. Hourly.", "Abandoned cart? Not on my watch."],
+    wedding: ["A wedding! Everyone stay calm.", "Florists, back off. Mine.", "Congrats! Now the baby ads.", "Anniversary reminders, locked in for life."],
+    baby: ["A baby! That’s 18 years of ads.", "Their first word will be our jingle.", "Diapers now, college funds later.", "Welcome to the world. Here’s your profile."],
+    moving: ["Boxes mean a new sofa.", "They’ll need a couch by Friday. And a lamp.", "Moving? We followed them here.", "New address, new everything."],
+    party: ["Who’s planning the next one? Us.", "Party now, regret ads tomorrow.", "Balloons? We’re in.", "We’ll remember the birthday. Forever."],
+    base: ["Honestly? Pleasant. Mildly marketable.", "Generic, but generic sells.", "Nothing in it. We’ll find something.", "I don’t get it, but I want it."],
+    night: ["Taken after dark. We have offers.", "Up late? So are our ads.", "Can’t sleep? Neither can we.", "Nothing good happens after 2am. We sell it."],
+    outdoor: ["Fresh air sells hiking boots.", "Touching grass? Noted. Logged. Sold.", "Nature. Our favorite backdrop.", "Allergy season ads, unlocked."],
+    x1: ["We’ll take the vibe, keep the face.", "Our algorithm blinked twice.", "I don’t know what it is. I want it."],
+    x2: ["Mostly here for the background.", "There’s a logo back there. Mine.", "Zoom into the corner. Thank me later."],
+    x3: ["The lighting alone is worth a cent.", "Eh. Bidding anyway.", "My boss said bid on everything."],
+    x4: ["Bidding on principle.", "We bid on everything. It’s our thing.", "It’s not personal. Well, it is. Very."],
+    r1: ["We’ve seen this face before. Hi.", "No hard feelings. Mostly."],
+    r2: ["Great face for training data.", "Hold still. Forever."],
+    r3: ["All five of us. Together.", "We share everything. Especially you."],
+    r4: ["Up at that hour? We need to talk.", "Sleep is a product. You’re out of stock."],
+    r5: ["Shared! Already shared!", "Linda says it’s blurry."],
+    local: ["We’re practically neighbors.", "We can see your street from here.", "Wave! No, the other window.", "Nice area. Prices just went up."],
   };
-  const RIVAL = ["Seriously? For <b>that</b>?", "Put the paddle down.", "Fine. I didn’t want it.", "Overpaying, but okay.", "My algorithm says no.", "You can have the thumb in it."];
-  const ROASTS = ["Bold of them to post this.", "Not the best angle. Still bidding.", "Mid photo. Great data.", "The camera tried its best.", "Is that a thumb? Adds value."];
-  function roastsFor(stats, meta, faces) {
-    const r = [];
-    if (meta && meta.late) r.push("Taken that late? We know what you were up to.");
-    if (meta && meta.gps) r.push("We know where this was taken. Do you?");
-    if (faces >= 2) r.push("We’ll take the one on the left.");
+  // friendlier names for what the model sees
+  const NICE = { "car wheel": "car", "grille": "car", "car mirror": "car", "beach wagon": "station wagon", "racer": "race car", "recreational vehicle": "RV", "golfcart": "golf cart", "Model T": "vintage car", "motor scooter": "scooter", "cab": "taxi", "limousine": "limo", "jeep": "SUV",
+    "seashore": "beach", "sandbar": "beach", "lakeside": "lake", "alp": "mountains", "promontory": "coastline", "airliner": "plane", "liner": "cruise ship", "mountain tent": "tent", "triumphal arch": "arch", "suspension bridge": "bridge", "steel arch bridge": "bridge", "beacon": "lighthouse", "breakwater": "harbor", "cliff dwelling": "ruins", "bell cote": "church", "megalith": "ruins", "paddlewheel": "boat", "lifeboat": "boat", "yawl": "sailboat", "schooner": "sailboat", "coral reef": "reef", "stupa": "temple",
+    "consomme": "soup", "French loaf": "baguette", "potpie": "pot pie", "chocolate sauce": "chocolate", "espresso maker": "coffee", "coffee mug": "coffee", "coffeepot": "coffee", "ice lolly": "popsicle", "spaghetti squash": "squash", "butcher shop": "butcher", "grocery store": "groceries", "mashed potato": "mashed potatoes", "meat loaf": "meatloaf",
+    "red wine": "wine", "beer bottle": "beer", "wine bottle": "wine", "beer glass": "beer", "cocktail shaker": "cocktails", "whiskey jug": "whiskey", "goblet": "wine", "corkscrew": "wine", "pop bottle": "soda",
+    "running shoe": "running shoes", "sweatshirt": "hoodie", "swimming trunks": "swimsuit", "bikini": "swimsuit", "maillot": "swimsuit", "ski": "skis", "mountain bike": "bike", "bicycle-built-for-two": "tandem bike", "balance beam": "gym", "horizontal bar": "gym", "parallel bars": "gym", "scuba diver": "scuba gear", "ballplayer": "game", "puck": "hockey", "football helmet": "football",
+    "studio couch": "couch", "four-poster": "bed", "china cabinet": "cabinet", "entertainment center": "TV setup", "home theater": "TV setup", "window shade": "blinds", "rocking chair": "chair", "folding chair": "chair", "table lamp": "lamp", "lampshade": "lamp", "chiffonier": "dresser", "medicine chest": "bathroom", "shower curtain": "bathroom", "tub": "bathtub", "washbasin": "sink", "refrigerator": "fridge", "washer": "washing machine", "fire screen": "fireplace", "sliding door": "door", "picket fence": "fence", "wall clock": "clock",
+    "iPod": "music player", "cellular telephone": "phone", "desktop computer": "computer", "television": "TV", "computer keyboard": "keyboard", "remote control": "remote", "hand-held computer": "tablet", "loudspeaker": "speaker", "Polaroid camera": "instant camera", "reflex camera": "camera", "digital watch": "watch",
+    "jean": "jeans", "sunglass": "sunglasses", "bonnet": "hat", "sandal": "sandals", "clog": "clogs", "cowboy boot": "boots", "Loafer": "loafers", "stole": "scarf", "feather boa": "boa", "mortarboard": "graduation cap",
+    "gown": "dress", "Windsor tie": "tie", "hoopskirt": "dress", "overskirt": "dress", "chain mail": "outfit",
+    "teddy": "teddy bear", "nipple": "baby bottle", "toyshop": "toys", "carton": "boxes", "moving van": "van", "packet": "boxes", "envelope": "mail",
+    "candle": "candles", "balloon": "balloons", "confectionery": "candy", "jack-o'-lantern": "pumpkin" };
+  // the one just outbid fires back at the new leader
+  const RIVAL = ["Seriously? For <b>that</b>?", "Easy, {who}. It’s one photo.", "Overpaying, {who}. Classic.", "Fine. I didn’t want it anyway.", "Enjoy. I already screenshotted it.", "I’ll buy it off {who} by Friday.", "You can have the thumb in it.", "I’ll remember this, {who}.", "My algorithm says no. My heart says yes."];
+  // now and then the new leader rubs it in instead
+  const OUTBID = ["Sorry, {who}. Not sorry.", "Move, {who}. Grown-ups are bidding.", "Cute bid, {who}.", "Go home, {who}."];
+  const MINE = ["Don’t even think about it.", "Touch that paddle. I dare you.", "Sit down. It’s mine.", "I know where your servers live."];
+  const ROASTS = ["Bold of them to post this.", "Not the best angle. Still bidding.", "Mid photo. Great data.", "The camera tried its best.", "Is that a thumb? Adds value.", "Blurry? We’ve paid more for worse.", "Ugh. Fine. I’m in.", "Love it. Don’t tell them I said that."];
+  const mix = (a) => a.slice().sort(() => Math.random() - 0.5);
+  // the opening lines go after what is actually in the photo and its file
+  function roastsFor(stats, meta, faces, bidders) {
+    const seen = bidders.find(b => b.thing), r = [];
+    if (meta && meta.place) r.push(`Near ${esc(meta.place)}? We have people there.`);
+    else if (meta && meta.gps) r.push("We know where this was taken. Do you?");
+    if (meta && meta.time) r.push(meta.late ? `${meta.time} on a ${meta.day}? We have questions.` : meta.work ? `${meta.day}, ${meta.time}? Shouldn’t you be working?` : `${meta.day}, ${meta.time}. We’ll remember that.`);
+    if (meta && meta.cam) r.push(meta.fancy ? `Shot on the ${esc(meta.cam)}? Big spender.` : `The ${esc(meta.cam)}? Upgrade ads, go.`);
+    if (faces >= 2) r.push(mix(["We’ll take the one on the left.", "Group photo. Volume discount.", "Who’s blinking? Asking for a client."])[0]);
+    else if (faces === 1) r.push(mix(["A face! Now we’re talking.", "Face found. Our favorite data type."])[0]);
     if (stats.lum < 62) r.push("Did you take this inside a pocket?");
-    else if (stats.lum > 185) r.push("Bright! Like our prices.");
-    return r.concat(ROASTS.slice().sort(() => Math.random() - 0.5));
+    else if (stats.lum > 185) r.push("So bright. Like our quarterly earnings.");
+    const spot = seen && mix([`${cap(seen.thing)} spotted. Wallets out.`, `${cap(seen.thing)}? Oh, we can work with that.`])[0];
+    return (spot ? [spot] : []).concat(mix(r), mix(ROASTS));
   }
   const bubbles = new Map();
   function say(armEl, html, rival) {
@@ -781,7 +814,13 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     // the auction keeps real time for everyone; reduced motion only drops the animations
     const wait = (ms) => new Promise(r => setTimeout(r, ms));
     const pick = (list) => list[Math.floor(rand() * list.length)];
-    const talkFor = (b) => pick(TALK[b.key] || TALK.base);
+    // nobody repeats a line in the same auction while they have fresh ones
+    const used = new Set();
+    const fresh = (list) => { const left = list.filter(x => !used.has(x)), l = pick(left.length ? left : list); used.add(l); return l; };
+    const talkFor = (b) => fresh((TALK[b.key] || TALK.base).filter(l => b.thing || !l.includes("{t}"))).replace("{t}", b.thing);
+    // bidders call each other by name, except the long rare ones
+    const named = (b) => /^[A-Z]/.test(b);
+    const fill = (line, who) => line.replace("{who}", esc(who)).replace("..", ".");
     // seat bidders on the five arms in a shuffled order
     const seats = (phone() ? [0, 1, 2] : [0, 1, 2, 3, 4]).sort(() => rand() - 0.5);
     const arm = (i) => armEls[seats[i]];
@@ -799,10 +838,14 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       caption.textContent = line;
       history.push({ price, bidder: bidders[i].bidder, seat: seats[i] });
       // the first bids roast the photo, later ones are about what each bidder wants, and the one outbid grumbles
-      const n = history.length, prev = history.length > 1 ? history[history.length - 2].seat : -1;
-      const text = n <= 2 && roasts.length ? roasts.shift() : talkFor(bidders[i]);
+      const n = history.length, beat = n > 1 && history[n - 2].seat !== seats[i] ? history[n - 2] : null;
+      let text = n <= 2 && roasts.length ? roasts.shift() : talkFor(bidders[i]);
+      if (n > 2 && beat && named(beat.bidder) && rand() < 0.3) text = fill(fresh(OUTBID), beat.bidder);
       setTimeout(() => say(arm(i), text), 380);
-      if (prev >= 0 && prev !== seats[i] && rand() < 0.55) setTimeout(() => say(armEls[prev], pick(RIVAL), true), 1050);
+      if (beat && rand() < 0.55) {
+        const back = named(bidders[i].bidder) ? RIVAL : RIVAL.filter(l => !l.includes("{who}"));
+        setTimeout(() => say(armEls[beat.seat], fill(fresh(back), bidders[i].bidder), true), 1050);
+      }
     };
     // paddles keep going for at least 4 seconds from the first bid
     const best = bidders[0].max, room = bidders.map(b => b.max);
@@ -839,7 +882,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       await wait(Math.min(1200, 4000 - (Date.now() - t1)));
     }
     caption.textContent = "Going once…"; await wait(800);
-    caption.textContent = "Going twice…"; say(arm(0), "Don’t even think about it."); await wait(800);
+    caption.textContent = "Going twice…"; say(arm(0), pick(MINE)); await wait(800);
     caption.textContent = "Sold!"; await wait(500);
     hush();
     return { price, winner: bidders[0], history };
@@ -897,7 +940,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
         result.bidders[0] = { ...lead, key: "local", bidder: `a data broker ${miles} miles from where this was taken`, reason: "the location", roast: `Congrats, you’re sold to a data broker ${miles} miles from where this was taken.` };
       }
     }
-    result.roasts = roastsFor(stats, meta, faces.length).slice(0, 2);
+    result.roasts = roastsFor(stats, meta, faces.length, result.bidders).slice(0, 2);
     if (faces.length >= 2) result.notes.push(`Group lot! ${faces.length} faces. Each one sells separately.`);
     const sale = await runAuction(result);
     showSold(sale, { meta, faces, basic: !preds, rand: result.rand });
