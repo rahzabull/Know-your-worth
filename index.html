@@ -119,6 +119,8 @@ body.bidding .bidding-copy { opacity: 1; transform: none; }
 body.is-sold .bidding-copy { opacity: 0; }
 .bid-band { position: absolute; left: calc(180 * var(--u)); top: calc(51 * var(--u)); width: calc(1137 * var(--u)); height: calc(95 * var(--u)); background: rgba(0,0,0,.3); filter: blur(calc(81 * var(--u))); z-index: -1; }
 body.narrow .bid-band { left: -20px; width: calc(100% + 40px); top: 77%; height: 170px; filter: blur(76px); }
+.bidding-title .dots { display: none; }
+body.narrow .bidding-title .dots { display: inline; }
 .bidding-title { margin: 0; color: var(--red); font-weight: 400; font-size: calc(150 * var(--u)); line-height: 1; letter-spacing: -.06em; white-space: nowrap; }
 .caption { display: block; margin-top: calc(18 * var(--u)); font-size: calc(21 * var(--u)); color: #fff; letter-spacing: -.02em; min-height: 1.3em; font-variant-numeric: tabular-nums; }
 
@@ -203,9 +205,11 @@ body.narrow .links { font-size: clamp(16px, 4.6vw, 20px); gap: 10px 32px; flex-w
 @media (max-height: 700px) { body.narrow h1 { font-size: 46px; } body.narrow .sub { font-size: 16px; } body.narrow .landing { gap: 10px; } }
 .links > * { white-space: nowrap; }
 body.narrow .bidding-copy { top: 0; bottom: 0; padding-inline: 10px; }
-body.narrow .bidding-title { position: absolute; left: 10px; right: 10px; top: calc(var(--nav) + 135 * var(--k)); }
+/* Phones: one line of red above the frame, on a soft dark glow, so the photo stays clear */
+body.narrow .bidding-title { position: absolute; z-index: 0; left: 10px; right: 10px; top: calc(var(--nav) + 16.5 * var(--k)); }
+body.narrow .bidding-title::before { content: ""; position: absolute; z-index: -1; left: 50%; top: calc(50% - 11 * var(--k)); width: calc(260 * var(--k)); height: calc(85 * var(--k)); transform: translate(-50%, -50%); background: #000; filter: blur(calc(42 * var(--k))); }
 body.narrow .caption { position: absolute; left: 20px; right: 20px; top: 85.7%; }
-body.narrow .bidding-title { font-size: clamp(40px, 13.8vw, 64px); white-space: normal; line-height: .95; }
+body.narrow .bidding-title { font-size: max(24px, calc(32 * var(--k))); line-height: .86; letter-spacing: -.045em; }
 body.narrow .caption { font-size: 15px; margin-top: 0; }
 body.narrow .sold { overflow-y: auto; background: var(--black); display: flex; flex-direction: column; }
 body.narrow .sold-shade, body.narrow .hush, body.narrow .bar.top { display: none; }
@@ -274,7 +278,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
   </div>
   <div class="bidding-copy" aria-live="polite">
     <div class="bid-band"></div>
-    <p class="bidding-title">Bidding in progress</p>
+    <p class="bidding-title">Bidding in progress<span class="dots">..</span></p>
     <span class="caption" id="caption">The auctioneer is examining the lot…</span>
   </div>
 </div>
