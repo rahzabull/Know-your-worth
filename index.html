@@ -129,25 +129,26 @@ body.narrow .bidding-title .dots { display: inline; }
 body.is-sold .sold { opacity: 1; pointer-events: auto; }
 .sold-shade { position: absolute; left: 0; right: 0; top: calc(var(--uy) + 123 * var(--u)); height: calc(676 * var(--u)); background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.42) 15%, rgba(0,0,0,.55) 30%, rgba(0,0,0,.65) 45%, rgba(0,0,0,.72) 60%, rgba(0,0,0,.78) 75%, rgba(0,0,0,.85) 100%); }
 .bar { position: absolute; left: 0; right: 0; background: var(--black); }
-.bar.top { top: 0; height: calc(var(--uy) + 185 * var(--u)); background: linear-gradient(180deg, var(--black) 0, var(--black) calc(var(--uy) + 150 * var(--u)), rgba(2,2,2,0) 100%); }
+.bar.top { top: 0; height: calc(var(--uy) + 319 * var(--u)); background: linear-gradient(180deg, var(--black) 0, var(--black) calc(var(--uy) + 166 * var(--u)), rgba(2,2,2,0) 100%); }
 .bar.bottom { top: calc(var(--uy) + 757 * var(--u)); bottom: 0; background: linear-gradient(180deg, rgba(2,2,2,0) 0, rgba(2,2,2,0) calc(42 * var(--u)), var(--black) calc(42 * var(--u))); display: grid; place-items: start center; align-content: start; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 8px max(8px, env(safe-area-inset-bottom, 0px)); }
 .hush { position: absolute; left: calc(var(--ux) + 393 * var(--u)); top: calc(var(--uy) + 149 * var(--u)); width: calc(668 * var(--u)); height: calc(668 * var(--u)); background: radial-gradient(closest-side, #000 50%, rgba(0,0,0,0)); }
 .sold-box { position: absolute; left: var(--ux); top: var(--uy); width: calc(1440 * var(--u)); height: calc(900 * var(--u)); }
-.lot { --s: var(--u); position: absolute; left: calc(503 * var(--u)); top: calc(110 * var(--u)); width: calc(470.35 * var(--s)); height: calc(430.6 * var(--s)); transform: scale(.75) rotate(4deg); opacity: 0; transition: transform .7s cubic-bezier(.2,.9,.25,1.2), opacity .4s; }
+.lot { --s: var(--u); position: absolute; left: calc(509 * var(--u)); top: calc(107 * var(--u)); width: calc(435 * var(--s)); height: calc(532 * var(--s)); transform: scale(.75) rotate(4deg); opacity: 0; transition: transform .7s cubic-bezier(.2,.9,.25,1.2), opacity .4s; }
 body.is-sold .lot { transform: none; opacity: 1; }
-.lot .photo { position: absolute; left: calc(77.8 * var(--s)); top: calc(131.5 * var(--s)); width: calc(326 * var(--s)); height: calc(219 * var(--s)); object-fit: cover; transform: rotate(-9.8deg); background: #111; }
-.lot .frame { position: absolute; inset: 0; width: 100%; height: 100%; }
-.plaque { position: absolute; left: calc(192.7 * var(--s)); top: calc(212.2 * var(--s)); width: calc(258.45 * var(--s)); height: calc(157.7 * var(--s)); transform: scale(1.7) rotate(-6deg); opacity: 0; transition: transform .45s .6s cubic-bezier(.2,.9,.3,1.3), opacity .2s .6s; }
+/* the buyer holds the frame; the photo sits in its window, tilted with it */
+.lot .holder { position: absolute; left: calc(var(--hx, 0) * var(--s)); top: calc(var(--hy, 0) * var(--s)); width: calc(var(--hw, 435) * var(--s)); height: calc(var(--hh, 532) * var(--s)); }
+.lot .photo { position: absolute; left: calc(77.87 * var(--s)); top: calc(190.71 * var(--s)); width: calc(292.62 * var(--s)); height: calc(193.61 * var(--s)); object-fit: cover; transform-origin: 0 0; transform: rotate(2.617deg); background: #111; }
+.plaque { --p: calc(var(--s) * .7525); position: absolute; left: calc(217.5 * var(--s)); top: calc(335 * var(--s)); width: calc(258.45 * var(--p)); height: calc(157.7 * var(--p)); transform: scale(1.7) rotate(-6deg); opacity: 0; transition: transform .45s .6s cubic-bezier(.2,.9,.3,1.3), opacity .2s .6s; }
 body.is-sold .plaque { transform: none; opacity: 1; }
 .plaque img { display: block; width: 100%; height: 100%; }
-.plaque .price { position: absolute; left: calc(84 * var(--s)); top: calc(102 * var(--s)); width: calc(100 * var(--s)); height: calc(40 * var(--s)); display: grid; place-items: center; font-family: var(--serif); font-weight: 500; font-size: calc(32 * var(--s)); color: var(--gold-ink); transform: rotate(-4.6deg); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.plaque .price { position: absolute; left: calc(84 * var(--p)); top: calc(102 * var(--p)); width: calc(100 * var(--p)); height: calc(40 * var(--p)); display: grid; place-items: center; font-family: var(--serif); font-weight: 500; font-size: calc(36 * var(--p)); color: var(--gold-ink); transform: rotate(-4.6deg); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .roast { position: absolute; left: calc(320 * var(--u)); width: calc(800 * var(--u)); top: calc(598 * var(--u)); margin: 0; text-align: center; color: var(--red); font-size: calc(22 * var(--u)); line-height: 1.15; text-wrap: balance; letter-spacing: -.045em; }
 .actions { position: absolute; left: calc(522 * var(--u)); top: calc(647 * var(--u)); display: flex; gap: calc(82.6 * var(--u)); transition: top .3s; }
 .leak { position: absolute; left: calc(270 * var(--u)); width: calc(900 * var(--u)); top: calc(632 * var(--u)); margin: 0; text-align: center; color: #d8d8d8; font-size: calc(16 * var(--u)); line-height: 1.35; letter-spacing: -.02em; text-wrap: balance; }
 .leak b { color: #fff; font-weight: 600; }
 .leak .up { color: var(--gold-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
 body.has-leak .actions { top: calc(684 * var(--u)); }
-.tags { position: absolute; left: calc(77.8 * var(--s)); top: calc(131.5 * var(--s)); width: calc(326 * var(--s)); height: calc(219 * var(--s)); transform: rotate(-9.8deg); pointer-events: none; }
+.tags { position: absolute; left: calc(77.87 * var(--s)); top: calc(190.71 * var(--s)); width: calc(292.62 * var(--s)); height: calc(193.61 * var(--s)); transform-origin: 0 0; transform: rotate(2.617deg); pointer-events: none; }
 .tag { position: absolute; transform: translate(-50%, -100%); background: var(--red); color: #fff; font-weight: 700; font-size: calc(12 * var(--s)); line-height: 1; padding: calc(4 * var(--s)) calc(6 * var(--s)); white-space: nowrap; font-variant-numeric: tabular-nums; opacity: 0; transition: opacity .3s; }
 body.is-sold .tag { opacity: 1; transition-delay: 1.1s; }
 .tag.top { background: var(--gold-ink); color: #2a1a00; }
@@ -213,10 +214,10 @@ body.narrow .bidding-title { font-size: max(24px, calc(32 * var(--k))); line-hei
 body.narrow .caption { font-size: 15px; margin-top: 0; }
 body.narrow .sold { overflow-y: auto; background: var(--black); display: flex; flex-direction: column; }
 body.narrow .sold-shade, body.narrow .hush, body.narrow .bar.top { display: none; }
-body.narrow .sold-box { position: relative; left: 0; top: 0; width: 100%; height: auto; display: grid; justify-items: center; gap: 22px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: max(84px, calc(env(safe-area-inset-top, 0px) + 40px)) 24px; flex: none; }
-body.narrow .lot { --s: calc(min(88vw, 470px) / 470.35); position: relative; left: -2vw; top: -10px; }
+body.narrow .sold-box { position: relative; left: 0; top: 0; width: 100%; height: auto; display: grid; justify-items: center; gap: 22px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: max(60px, calc(env(safe-area-inset-top, 0px) + 40px)) 24px; flex: none; }
+body.narrow .lot { --s: calc(min(77.2vw, 435px) / 435); position: relative; left: 0; top: 0; margin-bottom: calc(-74 * var(--s)); }
 body.narrow .roast, body.narrow .actions { position: static; }
-body.narrow .roast { width: auto; font-size: 18px; max-width: 30em; margin-top: -8px; }
+body.narrow .roast { position: relative; z-index: 1; left: 0; top: 0; width: auto; font-size: 18px; max-width: 30em; margin-top: -8px; }
 body.narrow .leak { position: static; width: auto; max-width: 30em; font-size: 14px; margin-top: -10px; }
 body.narrow .actions { gap: 14px; }
 body.narrow .btn { width: 140px; height: 50px; font-size: 17px; }
@@ -289,9 +290,9 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
   <div class="bar top"></div>
   <div class="sold-box">
     <div class="lot">
+      <img class="holder" id="soldHolder" src="assets/img/buyer-m.webp" alt="">
       <img class="photo" id="soldImg" alt="Your photo">
       <div class="tags" id="tags"></div>
-      <img class="frame" src="assets/img/frame.webp" alt="">
       <div class="plaque"><img src="assets/img/plaque.webp" alt="SOLD"><span class="price" id="soldPrice">$0.00</span></div>
     </div>
     <p class="roast" id="roast"></p>
@@ -844,8 +845,22 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     return { price, winner: bidders[0], history };
   }
 
+  /* ---------- Buyers on the SOLD screen, one at random per sale ----------
+     Each buyer holds the same frame. x, y, w, h place their art around the photo window, in lot units
+     (the lot is 435 x 532 and the window sits at 77.87, 190.71). To add a buyer, add a line here. */
+  const BUYERS = [
+    { key: "m", src: "assets/img/buyer-m.webp", x: 0, y: 0, w: 435, h: 532 },
+    { key: "f", src: "assets/img/buyer-f.webp", x: -4.69, y: -36.23, w: 445.2, h: 566.6 },
+  ];
+  function pickBuyer() {
+    const b = BUYERS[Math.floor(Math.random() * BUYERS.length)], el = $("soldHolder");
+    el.src = b.src;
+    Object.entries({ "--hx": b.x, "--hy": b.y, "--hw": b.w, "--hh": b.h }).forEach(([k, v]) => el.style.setProperty(k, v));
+    return b;
+  }
+
   /* ---------- Flow ---------- */
-  let busy = false, lastShare = "", lastSale = null;
+  let busy = false, lastShare = "", lastSale = null, buyer = BUYERS[0];
   async function auction(src, file) {
     if (busy) return;
     busy = true;
@@ -857,6 +872,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       busy = false; return;
     }
     $("soldImg").src = src;
+    buyer = pickBuyer(); // picked now so the art loads while the room bids
     body.classList.add("has-photo", "bidding");
     stopChatter();
     $("caption").textContent = "The auctioneer is examining the lot…";
@@ -888,12 +904,13 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     busy = false;
   }
 
-  // where a face lands inside the SOLD photo (326x219, cropped to cover); null when cropped out
+  // where a face lands inside the SOLD photo (PW x PH, cropped to cover); null when cropped out
+  const PW = 292.62, PH = 193.61;
   function facePoint(f, img) {
     const iw = img.naturalWidth, ih = img.naturalHeight;
-    const r = Math.max(326 / iw, 219 / ih), ox = (326 - iw * r) / 2, oy = (219 - ih * r) / 2;
+    const r = Math.max(PW / iw, PH / ih), ox = (PW - iw * r) / 2, oy = (PH - ih * r) / 2;
     const x = (f.x + f.width / 2) * r + ox, y = f.y * r + oy;
-    return x < 6 || x > 320 || y < 12 || y > 219 ? null : { x, y };
+    return x < 6 || x > PW - 6 || y < 12 || y > PH ? null : { x, y };
   }
   function placeTags(faces, rand, price) {
     const tags = $("tags"); tags.innerHTML = "";
@@ -905,7 +922,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       const el = document.createElement("span");
       el.className = "tag" + (i === top ? " top" : "");
       el.textContent = money(each[i]);
-      el.style.left = (x / 326 * 100) + "%"; el.style.top = (y / 219 * 100) + "%";
+      el.style.left = (x / PW * 100) + "%"; el.style.top = (y / PH * 100) + "%";
       tags.appendChild(el);
     });
     return total;
@@ -921,7 +938,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
   function showSold(sale, extra) {
     const { winner } = sale, { meta, faces, basic, rand } = extra;
     const price = placeTags(faces, rand, sale.price);
-    lastSale = { price, winner, rare: !!winner.rare, group: faces.length >= 2 ? faces.length : 0, history: sale.history };
+    lastSale = { price, winner, buyer, rare: !!winner.rare, group: faces.length >= 2 ? faces.length : 0, history: sale.history };
     $("soldPrice").textContent = money(price);
     $("roast").textContent = winner.roast || `Congrats, you’re sold to ${winner.bidder}. Mom will be proud.`;
     const bits = [];
@@ -983,62 +1000,69 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     if (line) out.push(line); return out;
   }
   const LAYOUT = {
-    post: { W: 1080, H: 1350, lx: 57, ly: 180, roastY: 1024, footY: 1250 },
-    story: { W: 1080, H: 1920, lx: 57, ly: 420, roastY: 1300, footY: 1770 },
+    post: { W: 1080, H: 1350, lx: 153, ly: 90, s: 1.78, roomY: -60, roomH: 1350, roastY: 975, footY: 1250 },
+    story: { W: 1080, H: 1920, lx: 71, ly: 134, s: 2.159, roomY: 11, roomH: 1667, roastY: 1225, footY: 1770 },
   };
   let art = null;
   async function loadArt() {
     if (!art) {
-      const [room, frame, plaque] = await Promise.all([loadImg("assets/img/room.jpg"), loadImg("assets/img/frame.webp"), loadImg("assets/img/plaque.webp")]);
+      const [room, plaque] = await Promise.all([loadImg("assets/img/room.jpg"), loadImg("assets/img/plaque.webp")]);
       await Promise.all(["300 40px 'Inter Tight'", "400 40px 'Inter Tight'", "600 40px 'Inter Tight'", "700 40px 'Inter Tight'", "500 40px Cinzel"].map(f => document.fonts.load(f).catch(() => {})));
-      art = { room, frame, plaque };
+      art = { room, plaque };
     }
-    return { ...art, photo: await loadImg($("soldImg").src) };
+    const [photo, holder] = await Promise.all([loadImg($("soldImg").src), loadImg($("soldHolder").src)]);
+    return { ...art, photo, holder };
   }
   const shortUrl = () => SHARE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
   // One frame of the card. f: { sold: 0..1 plaque stamp, roast: 0..1, bid: {price, bidder} | null }
   function drawCard(x, a, fmt, f) {
     const L = LAYOUT[fmt], { W, H } = L;
     x.fillStyle = "#050505"; x.fillRect(0, 0, W, H);
-    // the room sits at the same scale on both formats, so the wall painting stays hidden behind the lot
-    const rh = 1350, rw = rh * 1.6, ry = L.ly - 180; x.drawImage(a.room, (W - rw) / 2, ry, rw, rh);
-    if (ry > 0) { const t = x.createLinearGradient(0, 0, 0, ry + 260); t.addColorStop(0, "#050505"); t.addColorStop(ry / (ry + 260), "rgba(5,5,5,.9)"); t.addColorStop(1, "rgba(5,5,5,0)"); x.fillStyle = t; x.fillRect(0, 0, W, ry + 260); }
+    const rh = L.roomH, rw = rh * 1.6; x.drawImage(a.room, (W - rw) / 2, L.roomY, rw, rh);
     const g = x.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, "rgba(0,0,0,.55)"); g.addColorStop(.45, "rgba(0,0,0,.6)"); g.addColorStop(.75, "rgba(0,0,0,.85)"); g.addColorStop(1, "rgba(0,0,0,.96)");
     x.fillStyle = g; x.fillRect(0, 0, W, H);
-    // hush behind the lot, like the SOLD screen, so the wall painting doesn't peek out
-    const hx = L.lx + 470, hy = L.ly + 330, hush = x.createRadialGradient(hx, hy, 0, hx, hy, 620);
-    hush.addColorStop(0, "rgba(0,0,0,1)"); hush.addColorStop(.55, "rgba(0,0,0,.96)"); hush.addColorStop(1, "rgba(0,0,0,0)");
+    // hush behind the lot, like the SOLD screen
+    const s = L.s, photo = a.photo;
+    const hx = L.lx + 217.5 * s, hy = L.ly + 300 * s, hush = x.createRadialGradient(hx, hy, 0, hx, hy, 620);
+    hush.addColorStop(0, "rgba(0,0,0,.8)"); hush.addColorStop(.55, "rgba(0,0,0,.6)"); hush.addColorStop(1, "rgba(0,0,0,0)");
     x.fillStyle = hush; x.fillRect(0, 0, W, H);
-    const s = 2.0, photo = a.photo;
+    // the buyer holds the frame; the photo sits in its window, tilted with it
     x.save(); x.translate(L.lx, L.ly); x.scale(s, s);
-    x.save(); x.translate(240.8, 241); x.rotate(-9.8 * Math.PI / 180);
-    const pw = 326, ph = 219, r = Math.max(pw / photo.naturalWidth, ph / photo.naturalHeight);
-    x.beginPath(); x.rect(-pw / 2, -ph / 2, pw, ph); x.clip();
-    x.drawImage(photo, -photo.naturalWidth * r / 2, -photo.naturalHeight * r / 2, photo.naturalWidth * r, photo.naturalHeight * r);
+    const b = lastSale.buyer; x.drawImage(a.holder, b.x, b.y, b.w, b.h);
+    x.save(); x.translate(77.87, 190.71); x.rotate(2.617 * Math.PI / 180);
+    const pw = 292.62, ph = 193.61, r = Math.max(pw / photo.naturalWidth, ph / photo.naturalHeight);
+    x.beginPath(); x.rect(0, 0, pw, ph); x.clip();
+    x.drawImage(photo, (pw - photo.naturalWidth * r) / 2, (ph - photo.naturalHeight * r) / 2, photo.naturalWidth * r, photo.naturalHeight * r);
     if (f.sold >= 1) {
       // group price tags, copied from the SOLD screen
       x.font = "700 12px 'Inter Tight', Arial, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
       document.querySelectorAll("#tags .tag").forEach(t => {
-        const tx = parseFloat(t.style.left) / 100 * pw - pw / 2, ty = parseFloat(t.style.top) / 100 * ph - ph / 2;
+        const tx = parseFloat(t.style.left) / 100 * pw, ty = parseFloat(t.style.top) / 100 * ph;
         const tw = x.measureText(t.textContent).width + 12;
         x.fillStyle = t.classList.contains("top") ? "#f3dca4" : "#f63434"; x.fillRect(tx - tw / 2, ty - 20, tw, 20);
         x.fillStyle = t.classList.contains("top") ? "#2a1a00" : "#fff"; x.fillText(t.textContent, tx, ty - 10);
       });
     }
     x.restore();
-    x.drawImage(a.frame, 0, 0, 470.35, 430.6);
     if (f.sold > 0) {
-      const k = 1 + (1 - f.sold) * 0.8;
+      const k = (1 + (1 - f.sold) * 0.8) * .7525;
       x.save(); x.globalAlpha = Math.min(1, f.sold * 1.5);
-      x.translate(192.7 + 129.2, 212.2 + 78.8); x.scale(k, k); x.rotate((1 - f.sold) * -6 * Math.PI / 180); x.translate(-129.2, -78.8);
+      x.translate(217.5 + 129.2 * .7525, 335 + 78.8 * .7525); x.scale(k, k); x.rotate((1 - f.sold) * -6 * Math.PI / 180); x.translate(-129.2, -78.8);
       x.drawImage(a.plaque, 0, 0, 258.45, 157.7);
       x.translate(134, 122); x.rotate(-4.6 * Math.PI / 180);
-      x.fillStyle = "#f3dca4"; x.font = "500 32px Cinzel, Georgia, serif"; x.textAlign = "center"; x.textBaseline = "middle";
+      x.fillStyle = "#f3dca4"; x.font = "500 36px Cinzel, Georgia, serif"; x.textAlign = "center"; x.textBaseline = "middle";
       x.fillText(money(lastSale.price), 0, 0);
       x.restore();
     }
     x.restore();
+    // a soft dark pool behind the text under the lot, so it reads over the buyer's legs
+    if (f.roast > 0 || f.bid) {
+      x.save(); x.translate(W / 2, L.roastY - 2); x.scale(2.6, 1);
+      const pool = x.createRadialGradient(0, 0, 0, 0, 0, 170);
+      pool.addColorStop(0, "rgba(0,0,0,.9)"); pool.addColorStop(.6, "rgba(0,0,0,.7)"); pool.addColorStop(1, "rgba(0,0,0,0)");
+      x.fillStyle = pool; x.fillRect(-170, -170, 340, 340); x.restore();
+    }
     x.textAlign = "center"; x.textBaseline = "alphabetic";
     if (f.bid && f.sold === 0) {
       x.fillStyle = "#f63434"; x.font = "400 120px 'Inter Tight', Arial, sans-serif";
@@ -1048,18 +1072,17 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     }
     if (f.roast > 0) {
       x.globalAlpha = f.roast;
-      x.fillStyle = "#ff3b3b"; x.font = "400 42px 'Inter Tight', Arial, sans-serif";
-      const lines = wrap(x, $("roast").textContent, 900);
-      lines.forEach((l, i) => x.fillText(l, W / 2, L.roastY + i * 52));
-      let y = L.roastY + lines.length * 52 + 18;
+      const fs = fmt === "story" ? 50 : 44, lh = Math.round(fs * 1.12);
+      x.fillStyle = "#ff3b3b"; x.font = `400 ${fs}px 'Inter Tight', Arial, sans-serif`;
+      const lines = wrap(x, $("roast").textContent, 820);
+      lines.forEach((l, i) => x.fillText(l, W / 2, L.roastY + i * lh));
+      let y = L.roastY + lines.length * lh + 18;
       x.font = "500 30px 'Inter Tight', Arial, sans-serif"; x.fillStyle = "#f3dca4";
       if (lastSale.rare) { x.fillText("RARE SALE · about 1 in 12 photos", W / 2, y); y += 44; }
       if (lastSale.group) { x.fillText(`GROUP LOT · ${lastSale.group} faces sold separately`, W / 2, y); }
       x.globalAlpha = 1;
     }
     if (fmt === "story") {
-      x.textAlign = "center"; x.fillStyle = "#f3dca4"; x.font = "500 34px Cinzel, Georgia, serif";
-      x.fillText("LOT 4821  ·  ONE PHOTO", W / 2, 300);
       if (f.roast > 0) { x.globalAlpha = f.roast; x.fillStyle = "#fff"; x.font = "400 64px 'Inter Tight', Arial, sans-serif"; x.fillText(`Can you beat ${money(lastSale.price)}?`, W / 2, 1516); x.globalAlpha = 1; }
     }
     x.textAlign = "left"; x.fillStyle = "#fff"; x.font = "300 50px 'Inter Tight', Arial, sans-serif";
