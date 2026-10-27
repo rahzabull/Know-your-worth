@@ -123,6 +123,10 @@ body.narrow .bid-band { left: -20px; width: calc(100% + 40px); top: 77%; height:
 body.narrow .bidding-title .dots { display: inline; }
 .bidding-title { margin: 0; color: var(--red); font-weight: 400; font-size: calc(150 * var(--u)); line-height: 1; letter-spacing: -.06em; white-space: nowrap; }
 .caption { display: block; margin-top: calc(18 * var(--u)); font-size: calc(21 * var(--u)); color: #fff; letter-spacing: -.02em; min-height: 1.3em; font-variant-numeric: tabular-nums; }
+/* Going once, going twice, sold: the countdown reads big, each step popping in */
+.caption.count { font-size: calc(52 * var(--u)); font-weight: 600; letter-spacing: -.04em; line-height: 1.1; animation: tick .35s cubic-bezier(.2,1.4,.4,1); }
+@keyframes tick { from { transform: scale(.7); opacity: .3; } }
+@media (prefers-reduced-motion: reduce) { .caption.count { animation: none; } }
 
 /* ---------- SOLD end card ---------- */
 .sold { position: fixed; inset: 0; z-index: 20; opacity: 0; pointer-events: none; transition: opacity .6s; overflow: hidden; }
@@ -212,6 +216,7 @@ body.narrow .bidding-title::before { content: ""; position: absolute; z-index: -
 body.narrow .caption { position: absolute; left: 20px; right: 20px; top: 85.7%; }
 body.narrow .bidding-title { font-size: max(24px, calc(32 * var(--k))); line-height: .86; letter-spacing: -.045em; }
 body.narrow .caption { font-size: 15px; margin-top: 0; }
+body.narrow .caption.count { font-size: 34px; }
 body.narrow .sold { overflow-y: auto; background: var(--black); display: flex; flex-direction: column; }
 body.narrow .sold-shade, body.narrow .hush, body.narrow .bar.top { display: none; }
 body.narrow .sold-box { position: relative; left: 0; top: 0; width: 100%; height: auto; display: grid; justify-items: center; gap: 22px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: max(60px, calc(env(safe-area-inset-top, 0px) + 40px)) 24px; flex: none; }
@@ -881,9 +886,10 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
       caption.textContent = `${money(price)} to ${bidders[0].bidder}. Do I hear more?`;
       await wait(Math.min(1200, 4000 - (Date.now() - t1)));
     }
-    caption.textContent = "Going once…"; await wait(800);
-    caption.textContent = "Going twice…"; say(arm(0), pick(MINE)); await wait(800);
-    caption.textContent = "Sold!"; await wait(500);
+    const count = (text) => { caption.textContent = text; caption.classList.remove("count"); void caption.offsetWidth; caption.classList.add("count"); };
+    count("Going once…"); await wait(800);
+    count("Going twice…"); say(arm(0), pick(MINE)); await wait(800);
+    count("Sold!"); await wait(500);
     hush();
     return { price, winner: bidders[0], history };
   }
@@ -919,6 +925,7 @@ body.narrow .fine { margin-top: auto; padding-top: 24px; }
     body.classList.add("has-photo", "bidding");
     stopChatter();
     $("caption").textContent = "The auctioneer is examining the lot…";
+    $("caption").classList.remove("count");
     const stats = photoStats(img);
     let preds = null;
     const minWait = sleep(1600);
